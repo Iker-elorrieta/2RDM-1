@@ -1,4 +1,4 @@
-package conexion.modelo;
+package modelo;
 // Generated 14 ene 2025, 11:50:45 by Hibernate Tools 6.5.1.Final
 
 import java.util.HashSet;

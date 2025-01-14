@@ -13,8 +13,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import conexion.modelo.Ciclos;
-import conexion.modelo.HibernateUtil;
+import modelo.Ciclos;
+import modelo.HibernateUtil;
 
 public class Metodos {
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
