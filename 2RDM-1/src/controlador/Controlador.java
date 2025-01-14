@@ -7,32 +7,30 @@ import vista.Principal;
 
 public class Controlador implements ActionListener {
 	private vista.Principal vistaPrincipal;
-	private vista.PanelLogin vistaMenu;
-	private vista.PanelMenu vistaEjemplo;
+	private vista.PanelLogin vistaLogin;
+	private vista.PanelMenu vistaMenu;
 
-	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaMenu, vista.PanelMenu vistaEjemplo) {
+	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu) {
 		this.vistaPrincipal = vistaPrincipal;
+		this.vistaLogin = vistaLogin;
 		this.vistaMenu = vistaMenu;
-		this.vistaEjemplo = vistaEjemplo;
 
 		this.inicializarControlador();
 	}
 
 	private void inicializarControlador() {
+		accionesVistaLogin();
 		accionesVistaMenu();
-		accionesVistaEjemplo();
+
+	}
+
+	private void accionesVistaLogin() {
+		this.vistaLogin.getBtnLogin().addActionListener(this);
+		this.vistaLogin.getBtnLogin().setActionCommand(Principal.enumAcciones.LOGIN_INICIAR_SESION.toString());
 
 	}
 
 	private void accionesVistaMenu() {
-		this.vistaMenu.getBtnLogin().addActionListener(this);
-		this.vistaMenu.getBtnLogin().setActionCommand(Principal.enumAcciones.LOGIN_INICIAR_SESION.toString());
-
-	}
-
-	private void accionesVistaEjemplo() {
-		this.vistaEjemplo.getBtnPrevious().addActionListener(this);
-		this.vistaEjemplo.getBtnPrevious().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
 
 	}
 
