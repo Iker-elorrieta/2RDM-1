@@ -10,21 +10,21 @@ public class Principal extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static enum enumAcciones {
-		PANEL_MENU, PANEL_EJEMPLO
+		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU
 	}
 
 	private JPanel panelContenedor;
+	private PanelLogin panelLogin;
 	private PanelMenu panelMenu;
-	private PanelEjemplo panelEjemplo;
 
 	public Principal() {
 
 		crearPanelContenedor();
+		crearPanelLogin();
 		crearPanelMenu();
-		crearPanelEjemplo();
 
 		// Mostrar el panel de login al inicio.
-		visualizarPaneles(enumAcciones.PANEL_MENU);
+		visualizarPaneles(enumAcciones.PANEL_LOGIN);
 	}
 
 	private void crearPanelContenedor() {
@@ -37,36 +37,46 @@ public class Principal extends JFrame {
 		panelContenedor.setLayout(null);
 	}
 
+	private void crearPanelLogin() {
+		panelLogin = new PanelLogin();
+		panelLogin.setBounds(0, 0, 884, 561);
+		panelContenedor.add(panelLogin);
+		panelLogin.setVisible(false); // Ocultar inicialmente
+
+	}
+
 	private void crearPanelMenu() {
 		panelMenu = new PanelMenu();
+		panelMenu.setBounds(0, 0, 884, 561);
 		panelContenedor.add(panelMenu);
 		panelMenu.setVisible(false); // Ocultar inicialmente
 
 	}
 
-	private void crearPanelEjemplo() {
-		panelEjemplo = new PanelEjemplo();
-		panelContenedor.add(panelEjemplo);
-		panelEjemplo.setVisible(false); // Ocultar inicialmente
-
-	}
-
 	public void visualizarPaneles(enumAcciones panel) {
 		// Ocultar ambos paneles primero.
+		panelLogin.setVisible(false);
 		panelMenu.setVisible(false);
-		panelEjemplo.setVisible(false);
 
 		switch (panel) {
+		case PANEL_LOGIN:
+			panelLogin.setVisible(true);
+			break;
 		case PANEL_MENU:
 			panelMenu.setVisible(true);
-			break;
-		case PANEL_EJEMPLO:
-			panelEjemplo.setVisible(true);
 			break;
 		default:
 			break;
 
 		}
+	}
+
+	public PanelLogin getPanelLogin() {
+		return panelLogin;
+	}
+
+	public void setPanelLogin(PanelLogin panelLogin) {
+		this.panelLogin = panelLogin;
 	}
 
 	public PanelMenu getPanelMenu() {
@@ -75,14 +85,6 @@ public class Principal extends JFrame {
 
 	public void setPanelMenu(PanelMenu panelMenu) {
 		this.panelMenu = panelMenu;
-	}
-
-	public PanelEjemplo getPanelEjemplo() {
-		return panelEjemplo;
-	}
-
-	public void setPanelEjemplo(PanelEjemplo panelEjemplo) {
-		this.panelEjemplo = panelEjemplo;
 	}
 
 }
