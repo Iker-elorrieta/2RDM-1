@@ -24,7 +24,7 @@ public class Servidor {
     			DataOutputStream salida = new DataOutputStream(socket.getOutputStream());
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
                 
-                salida.writeUTF("Bienvenido al servidor numero ");
+                salida.writeUTF("Bienvenido al servidor numero");
                 salida.write(1);
                 
                 String mensajeCliente = entrada.readUTF()+entrada.read();
@@ -32,7 +32,6 @@ public class Servidor {
                 
                 metodos.conectarJSON();
                 
-                System.out.println("PRUEBA---");
                 metodos.pruebaSentenciaHQL();
                 
 

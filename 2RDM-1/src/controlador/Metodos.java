@@ -8,11 +8,17 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.stream.JsonReader;
+
+import conexion.Centros;
 import modelo.Ciclos;
 import modelo.HibernateUtil;
 
@@ -20,6 +26,7 @@ public class Metodos {
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
 	final String url = "src/centros.json";
+    private List<Centros> centros;
 
 	public void conectarJSON() {
 		JsonParser parser = new JsonParser();
@@ -32,6 +39,7 @@ public class Metodos {
 			e.printStackTrace();
 		}
 	}
+
 	
 	private static void parser(JsonElement datos) {
 		if (datos.isJsonArray()) {
