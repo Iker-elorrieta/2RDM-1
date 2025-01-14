@@ -7,6 +7,16 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.48</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
 			<version>8.1.0</version>
@@ -22,7 +32,77 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.21</version>
 		</dependency>
+		<dependency>
 
+			<groupId>org.hibernate</groupId>
+
+			<artifactId>hibernate-core</artifactId>
+
+			<version>5.1.0.Final</version>
+
+			<exclusions>
+
+				<exclusion>
+
+					<groupId>xml-apis</groupId>
+
+					<artifactId>xml-apis</artifactId>
+
+				</exclusion>
+
+			</exclusions>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>com.sun.istack</groupId>
+
+			<artifactId>istack-commons-runtime</artifactId>
+
+			<version>4.0.0</version>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>javax.xml.bind</groupId>
+
+			<artifactId>jaxb-api</artifactId>
+
+			<version>2.3.1</version>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>com.sun.xml.bind</groupId>
+
+			<artifactId>jaxb-impl</artifactId>
+
+			<version>2.3.1</version>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>mysql</groupId>
+
+			<artifactId>mysql-connector-java</artifactId>
+
+			<version>5.1.48</version>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>org.javassist</groupId>
+
+			<artifactId>javassist</artifactId>
+
+			<version>3.25.0-GA</version>
+
+		</dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
