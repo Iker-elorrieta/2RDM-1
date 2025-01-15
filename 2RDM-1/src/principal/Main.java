@@ -11,7 +11,9 @@ public class Main {
 			ventanaPrincipal.setVisible(true);
 
 			// Crear el controlador con las referencias correctas a los paneles existentes
-			new Controlador(ventanaPrincipal, ventanaPrincipal.getPanelLogin(), ventanaPrincipal.getPanelMenu());
+			new Controlador(ventanaPrincipal, ventanaPrincipal.getPanelLogin(), ventanaPrincipal.getPanelMenu(),
+					ventanaPrincipal.getPanelHorario(), ventanaPrincipal.getPanelOtrosHorarios(),
+					ventanaPrincipal.getPanelReuniones());
 
 		} catch (Exception e) {
 			e.printStackTrace();

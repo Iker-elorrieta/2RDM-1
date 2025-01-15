@@ -21,7 +21,7 @@ public class PanelLogin extends JPanel {
 
 	public PanelLogin() {
 		setBackground(new Color(220, 220, 220));
-		setBounds(0, 0, 900, 600);
+		setBounds(0, 0, 884, 561);
 		setLayout(null);
 
 		btnLogin = new JButton("Login");
@@ -64,7 +64,24 @@ public class PanelLogin extends JPanel {
 		return btnLogin;
 	}
 
-	public void setBtnLogin(JButton btnLogin) {
-		this.btnLogin = btnLogin;
+	public JLabel getLblUser() {
+		return lblUser;
 	}
+
+	public JLabel getLblPswd() {
+		return lblPswd;
+	}
+
+	public JLabel getLblTitle() {
+		return lblTitle;
+	}
+
+	public JTextField getTxtFUser() {
+		return txtFUser;
+	}
+
+	public JPasswordField getPswdFPassword() {
+		return pswdFPassword;
+	}
+
 }
