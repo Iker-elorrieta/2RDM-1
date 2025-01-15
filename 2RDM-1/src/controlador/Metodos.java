@@ -8,6 +8,7 @@ import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -82,7 +83,19 @@ public class Metodos {
 
 	}
 
-	public void pruebaSentenciaHQL() {
+
+	public void guardarCiclo(int id, String nombre) {
+		Transaction tx = null;
+		tx =session.beginTransaction();
+		Ciclos newCiclo = new Ciclos();
+		newCiclo.setId(id);
+		newCiclo.setNombre(nombre);
+		session.save(newCiclo);
+		tx.commit();
+		
+	}
+
+	/*public void pruebaSentenciaHQL() {
 		String hql ="FROM Ciclos";
         Query q = session.createQuery(hql);
         List<Ciclos> listaCiclos = q.list();
@@ -93,6 +106,6 @@ public class Metodos {
         	System.out.println(ciclo.getNombre());
         }
 		
-	}
+	}*/
 
 }

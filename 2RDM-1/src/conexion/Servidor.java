@@ -3,6 +3,7 @@ package conexion;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import controlador.Metodos;
@@ -24,16 +25,28 @@ public class Servidor {
     			DataOutputStream salida = new DataOutputStream(socket.getOutputStream());
                 DataInputStream entrada = new DataInputStream(socket.getInputStream());
                 
-                salida.writeUTF("Bienvenido al servidor numero");
+                salida.writeUTF("Bienvenido al servidor numero ");
                 salida.write(1);
                 
-                String mensajeCliente = entrada.readUTF()+entrada.read();
+                String mensajeCliente = entrada.readUTF()+entrada.readInt();
                 System.out.println(mensajeCliente);
                 
-                metodos.conectarJSON();
+                //metodos.conectarJSON(); TODO FUNCIONA PERO LO HE COMENTADO PORQUE EL SYSO ES MUY GRANDE
                 
-                metodos.pruebaSentenciaHQL();
+                //metodos.pruebaSentenciaHQL();
                 
+                ObjectInputStream entradaObjeto = new ObjectInputStream(socket.getInputStream());
+
+                try {
+					int id = (int) entradaObjeto.readObject();
+					String nombre = (String) entradaObjeto.readObject();
+					
+					metodos.guardarCiclo(id,nombre);
+			        
+			        
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
 
             }
             
