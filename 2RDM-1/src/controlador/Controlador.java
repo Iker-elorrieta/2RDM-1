@@ -3,8 +3,8 @@ package controlador;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -140,12 +140,12 @@ public class Controlador implements ActionListener {
 		int resultadoId = 0;
 		
 		try {
-            PrintWriter salidaDatosLogin = new PrintWriter(socket.getOutputStream(), true);
+            DataOutputStream salidaDatosLogin = new DataOutputStream(socket.getOutputStream());
             DataInputStream entradaResultadoLogin = new DataInputStream(socket.getInputStream());
 
 			String[] datosLogin = {"login",user,pswd};
 			
-			salidaDatosLogin.println(String.join(",", datosLogin));//Envia datosLogin separado por comas
+			salidaDatosLogin.writeUTF(String.join(",", datosLogin));//Envia datosLogin separado por comas
 
 			resultadoId = (int) entradaResultadoLogin.readInt();
 		} catch (IOException e) {

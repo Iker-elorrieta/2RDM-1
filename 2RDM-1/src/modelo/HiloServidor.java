@@ -1,9 +1,8 @@
 package modelo;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import controlador.Metodos;
 
@@ -18,11 +17,11 @@ public class HiloServidor extends Thread {
 	@Override
 	public void run() {
 		try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+            DataInputStream entrada = new DataInputStream(cliente.getInputStream());
             DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
             
             // Lee los datos del cliente
-            String[] datosRecibidos = reader.readLine().split(",");
+            String[] datosRecibidos = entrada.readUTF().split(",");
 			
 			if(datosRecibidos[0].equals("login")) {
 				salida.writeInt(metodos.login(datosRecibidos[1],datosRecibidos[2]));
