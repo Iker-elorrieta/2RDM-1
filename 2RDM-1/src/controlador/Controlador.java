@@ -2,14 +2,13 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.swing.JOptionPane;
-import modelo.Datos;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -20,6 +19,7 @@ public class Controlador implements ActionListener {
 	private vista.PanelOtrosHorarios vistaOtrosHorarios;
 	private vista.PanelReuniones vistaReuniones;
 	private Socket socket = null;
+	private Metodos metodos = new Metodos();
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
@@ -37,7 +37,7 @@ public class Controlador implements ActionListener {
 
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
-		String ip = "10.5.13.46";
+		String ip = /*"10.5.13.46"*/ "localhost";
 		try {
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado al servidor.");
@@ -136,21 +136,23 @@ public class Controlador implements ActionListener {
 		}
 
 		int resultadoId = 0;
-		Datos datosLogin = new Datos("login", null, user, pswd);
 
 		try {
-			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
 
-			salidaDatosLogin.writeObject(datosLogin);
-			salidaDatosLogin.flush();
+			DataOutputStream salidaDatosLogin = new DataOutputStream(socket.getOutputStream());
+			DataInputStream entradaResultadoLogin = new DataInputStream(socket.getInputStream());
 
-			resultadoId = (int) entradaResultadoLogin.readObject();
-		} catch (IOException | ClassNotFoundException e) {
+			String[] datosLogin = { "login", user, pswd };
+
+			salidaDatosLogin.writeUTF(String.join(",", datosLogin));// Envia datosLogin separado por comas
+
+			resultadoId = (int) entradaResultadoLogin.readInt();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		if (resultadoId != 0) {
+			metodos.guardarCiclo(8, "ELECRONICA");
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
 					JOptionPane.INFORMATION_MESSAGE);
 

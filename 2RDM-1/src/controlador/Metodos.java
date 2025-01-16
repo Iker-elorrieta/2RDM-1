@@ -75,17 +75,18 @@ public class Metodos {
 
 	}
 
-	/*
-	 * public void guardarCiclo(int id, String nombre) { Transaction tx = null; tx
-	 * =session.beginTransaction(); Ciclos newCiclo = new Ciclos();
-	 * newCiclo.setId(id); newCiclo.setNombre(nombre); session.save(newCiclo);
-	 * tx.commit();
-	 * 
-	 * }
-	 */
+	public void guardarCiclo(int id, String nombre) {
+		Transaction tx = null;
+		tx = session.beginTransaction();
+		Ciclos newCiclo = new Ciclos();
+		newCiclo.setId(id);
+		newCiclo.setNombre(nombre);
+		session.save(newCiclo);
+		tx.commit();
+
+	}
 
 	public int login(String user, String pswd) {
-
 		String hql = "FROM Users WHERE username='" + user + "' AND password='" + pswd + "' AND tipo_id!='" + 4 + "'";
 		Query q = session.createQuery(hql);
 		Users usuario = (Users) q.uniqueResult();
@@ -93,6 +94,7 @@ public class Metodos {
 			return 0;
 		} else {
 			return usuario.getId();
+
 		}
 	}
 
