@@ -4,11 +4,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import controlador.Metodos;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
 
 public class HiloServidor extends Thread {
 	private Socket cliente;
-	private Metodos metodos = new Metodos();
+	
+	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
+	private static Session session = sesion.openSession();
 
 	public HiloServidor(Socket cliente) {
 		this.cliente = cliente;
@@ -17,23 +21,33 @@ public class HiloServidor extends Thread {
 	@Override
 	public void run() {
 		try {
-            DataInputStream entrada = new DataInputStream(cliente.getInputStream());
-            DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
+			
+			while(true){
+	            DataInputStream entrada = new DataInputStream(cliente.getInputStream());
+	            DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
 
-			// Lee los datos del cliente
-			String[] datosRecibidos = entrada.readUTF().split(",");
+				// Lee los datos del cliente
+				final String[] datosRecibidos = entrada.readUTF().split(",");
 
+				if (datosRecibidos[0].equals("login")) {
+					Users usuario = new Users();
+					int idUsuario = usuario.login(datosRecibidos[1], datosRecibidos[2],session);
+					
+					salida.writeInt(idUsuario);
+					
+					if(idUsuario!=0) {
+						Ciclos.guardarCiclo(8, "ELECRONICA",session);
+					}
+					
+					salida.flush();
 
-			if (datosRecibidos[0].equals("login")) {
-				salida.writeInt(metodos.login(datosRecibidos[1], datosRecibidos[2]));
-				salida.flush();
+				} else if (datosRecibidos[0].equals("registro")) {
 
-			} else if (datosRecibidos[0].equals("registro")) {
-
+				}
 			}
 
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

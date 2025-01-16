@@ -19,7 +19,7 @@ public class Controlador implements ActionListener {
 	private vista.PanelOtrosHorarios vistaOtrosHorarios;
 	private vista.PanelReuniones vistaReuniones;
 	private Socket socket = null;
-	private Metodos metodos = new Metodos();
+
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
@@ -31,7 +31,9 @@ public class Controlador implements ActionListener {
 		this.vistaOtrosHorarios = vistaOtrosHorarios;
 		this.vistaReuniones = vistaReuniones;
 		
+		this.iniciarConexionConServidor();
 		this.inicializarControlador();
+		
 	}
 
 	private void iniciarConexionConServidor() {
@@ -134,30 +136,23 @@ public class Controlador implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Rellene todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		this.iniciarConexionConServidor();
 
 		int resultadoId = 0;
 
 		try {
-
 			DataOutputStream salidaDatosLogin = new DataOutputStream(socket.getOutputStream());
 			DataInputStream entradaResultadoLogin = new DataInputStream(socket.getInputStream());
 
 			String[] datosLogin = { "login", hash(user), hash(pswd) };
 
-			System.out.println(hash(user) + " " + hash(pswd));
-
 			salidaDatosLogin.writeUTF(String.join(",", datosLogin));// Envia datosLogin separado por comas
 
 			resultadoId = (int) entradaResultadoLogin.readInt();
-		} catch (IOException e) {
+		} catch (IOException | NoSuchAlgorithmException e) {
 			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+		} 
 
 		if (resultadoId != 0) {
-			 metodos.guardarCiclo(8, "ELECRONICA");
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
 					JOptionPane.INFORMATION_MESSAGE);
 
@@ -198,4 +193,6 @@ public class Controlador implements ActionListener {
 
 		return resumenString.toString();
 	}
+	
+	
 }
