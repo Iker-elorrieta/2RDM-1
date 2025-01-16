@@ -1,10 +1,10 @@
 package modelo;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
-
 import controlador.Metodos;
 
 public class HiloServidor extends Thread {
@@ -18,20 +18,21 @@ public class HiloServidor extends Thread {
 	@Override
 	public void run() {
 		try {
-			ObjectInputStream entradaLogin = new ObjectInputStream(cliente.getInputStream());
-			ObjectOutputStream salidaLogin = new ObjectOutputStream(cliente.getOutputStream());
-
-			Datos datosLogin = (Datos) entradaLogin.readObject();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+            DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
+            
+            // Lee los datos del cliente
+            String[] datosRecibidos = reader.readLine().split(",");
 			
-			if(datosLogin.getOperacion().equals("login")) {
-				salidaLogin.writeObject(metodos.login(datosLogin.getUsername(),datosLogin.getContrasenna()));
-				salidaLogin.flush();
+			if(datosRecibidos[0].equals("login")) {
+				salida.writeInt(metodos.login(datosRecibidos[1],datosRecibidos[2]));
+				salida.flush();
 				
-			}else if(datosLogin.getOperacion().equals("registro")) {
+			}else if(datosRecibidos[0].equals("registro")) {
 				
 			}
 			
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -75,7 +75,7 @@ public class Metodos {
 
 	}
 
-	/*public void guardarCiclo(int id, String nombre) {
+	public void guardarCiclo(int id, String nombre) {
 		Transaction tx = null;
 		tx =session.beginTransaction();
 		Ciclos newCiclo = new Ciclos();
@@ -84,17 +84,17 @@ public class Metodos {
 		session.save(newCiclo);
 		tx.commit();
 		
-	}*/
+	}
 	
 	public int login(String user, String pswd) {
-		
 		String hql ="FROM Users WHERE username='"+user+"' AND password='"+pswd+"'";
         Query q = session.createQuery(hql);
         Users usuario = (Users) q.uniqueResult();
         if(usuario==null) {
     		return 0;
         }else {
-    		return usuario.getId();	
+    		return usuario.getId();
+    		
         }
 	}
 
