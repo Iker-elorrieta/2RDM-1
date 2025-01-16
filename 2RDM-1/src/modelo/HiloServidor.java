@@ -19,23 +19,24 @@ public class HiloServidor extends Thread {
 		try {
             DataInputStream entrada = new DataInputStream(cliente.getInputStream());
             DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
-            
-            // Lee los datos del cliente
-            String[] datosRecibidos = entrada.readUTF().split(",");
-			
-			if(datosRecibidos[0].equals("login")) {
-				salida.writeInt(metodos.login(datosRecibidos[1],datosRecibidos[2]));
+
+			// Lee los datos del cliente
+			String[] datosRecibidos = entrada.readUTF().split(",");
+
+
+			if (datosRecibidos[0].equals("login")) {
+				salida.writeInt(metodos.login(datosRecibidos[1], datosRecibidos[2]));
 				salida.flush();
-				
-			}else if(datosRecibidos[0].equals("registro")) {
-				
+
+			} else if (datosRecibidos[0].equals("registro")) {
+
 			}
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

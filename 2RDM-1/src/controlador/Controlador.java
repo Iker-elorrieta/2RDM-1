@@ -30,14 +30,14 @@ public class Controlador implements ActionListener {
 		this.vistaHorario = vistaHorario;
 		this.vistaOtrosHorarios = vistaOtrosHorarios;
 		this.vistaReuniones = vistaReuniones;
-
-		this.iniciarConexionConServidor();
+		
 		this.inicializarControlador();
 	}
 
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
-		String ip = /*"10.5.13.46"*/ "localhost";
+		// String ip = "10.5.13.47";
+		String ip = "localhost";
 		try {
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado al servidor.");
@@ -134,6 +134,7 @@ public class Controlador implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Rellene todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+		this.iniciarConexionConServidor();
 
 		int resultadoId = 0;
 
@@ -142,22 +143,27 @@ public class Controlador implements ActionListener {
 			DataOutputStream salidaDatosLogin = new DataOutputStream(socket.getOutputStream());
 			DataInputStream entradaResultadoLogin = new DataInputStream(socket.getInputStream());
 
-			String[] datosLogin = { "login", user, pswd };
+			String[] datosLogin = { "login", hash(user), hash(pswd) };
+
+			System.out.println(hash(user) + " " + hash(pswd));
 
 			salidaDatosLogin.writeUTF(String.join(",", datosLogin));// Envia datosLogin separado por comas
 
 			resultadoId = (int) entradaResultadoLogin.readInt();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
 		}
 
 		if (resultadoId != 0) {
-			metodos.guardarCiclo(8, "ELECRONICA");
+			 metodos.guardarCiclo(8, "ELECRONICA");
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
 					JOptionPane.INFORMATION_MESSAGE);
 
 			ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
 					Principal.enumAcciones.PANEL_MENU.toString());
+
 			actionPerformed(e);
 
 		} else if (resultadoId == 0) {
@@ -178,16 +184,18 @@ public class Controlador implements ActionListener {
 	}
 
 	public static String hash(String respuesta) throws NoSuchAlgorithmException {
-		String resumenString = new String();
+		StringBuilder resumenString = new StringBuilder();
 		MessageDigest md = MessageDigest.getInstance("SHA");
 
-		byte dataBytes[] = respuesta.getBytes();
+		byte[] dataBytes = respuesta.getBytes();
 		md.update(dataBytes);
 
-		byte resumen[] = md.digest();
-		resumenString = new String(resumen);
+		byte[] resumen = md.digest();
 
-		return resumenString;
+		for (byte b : resumen) {
+			resumenString.append(String.format("%02x", b));
+		}
 
+		return resumenString.toString();
 	}
 }
