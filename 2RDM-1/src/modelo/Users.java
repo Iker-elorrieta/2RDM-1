@@ -182,5 +182,6 @@ public class Users implements java.io.Serializable {
 	public void setHorarioses(Set horarioses) {
 		this.horarioses = horarioses;
 	}
-
+	
+	
 }

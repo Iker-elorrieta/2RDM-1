@@ -3,31 +3,24 @@ package controlador;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.stream.JsonReader;
-
-import conexion.Centros;
 import modelo.Ciclos;
 import modelo.HibernateUtil;
+import modelo.Users;
 
 public class Metodos {
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
 	final String url = "src/centros.json";
-    private List<Centros> centros;
 
 	public void conectarJSON() {
 		JsonParser parser = new JsonParser();
@@ -40,7 +33,6 @@ public class Metodos {
 			e.printStackTrace();
 		}
 	}
-
 	
 	private static void parser(JsonElement datos) {
 		if (datos.isJsonArray()) {
@@ -83,8 +75,7 @@ public class Metodos {
 
 	}
 
-
-	public void guardarCiclo(int id, String nombre) {
+	/*public void guardarCiclo(int id, String nombre) {
 		Transaction tx = null;
 		tx =session.beginTransaction();
 		Ciclos newCiclo = new Ciclos();
@@ -93,6 +84,18 @@ public class Metodos {
 		session.save(newCiclo);
 		tx.commit();
 		
+	}*/
+	
+	public int login(String user, String pswd) {
+		
+		String hql ="FROM Users WHERE username='"+user+"' AND password='"+pswd+"'";
+        Query q = session.createQuery(hql);
+        Users usuario = (Users) q.uniqueResult();
+        if(usuario==null) {
+    		return 0;
+        }else {
+    		return usuario.getId();	
+        }
 	}
 
 	/*public void pruebaSentenciaHQL() {

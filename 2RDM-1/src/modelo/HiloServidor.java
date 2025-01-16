@@ -1,33 +1,41 @@
 package modelo;
 
-import conexion.Servidor;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+import controlador.Metodos;
 
 public class HiloServidor extends Thread {
-	private Servidor s;
-	private String operacion, user, name, pswd;
-	private int resultado;
+	private Socket cliente;
+	private Metodos metodos = new Metodos();
 
-	public HiloServidor(Servidor s, String operacion, String user, String name, String pswd) {
-		this.s = s;
-		this.operacion = operacion;
-		this.user = user;
-		this.name = name;
-		this.pswd = pswd;
-		
+	public HiloServidor(Socket cliente) {
+		this.cliente = cliente;
 	}
 
 	@Override
 	public void run() {
-		if (operacion.equals("registro")) {
-			// resultado = s.registro(user, name, pswd);
-		} else if (operacion.equals("login")) {
-			resultado = s.login(user, pswd);
-		} else {
-			System.out.println("Operación no reconocida.");
+		try {
+			ObjectInputStream entradaLogin = new ObjectInputStream(cliente.getInputStream());
+			ObjectOutputStream salidaLogin = new ObjectOutputStream(cliente.getOutputStream());
+
+			Datos datosLogin = (Datos) entradaLogin.readObject();
+			
+			if(datosLogin.getOperacion().equals("login")) {
+				salidaLogin.writeObject(metodos.login(datosLogin.getUsername(),datosLogin.getContrasenna()));
+				salidaLogin.flush();
+				
+			}else if(datosLogin.getOperacion().equals("registro")) {
+				
+			}
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
 	}
 
-	public int getResultado() {
-		return resultado;
-	}
 }
