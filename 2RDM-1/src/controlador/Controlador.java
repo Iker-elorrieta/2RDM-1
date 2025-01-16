@@ -30,7 +30,7 @@ public class Controlador implements ActionListener {
 		this.vistaHorario = vistaHorario;
 		this.vistaOtrosHorarios = vistaOtrosHorarios;
 		this.vistaReuniones = vistaReuniones;
-		
+
 		this.inicializarControlador();
 	}
 
@@ -157,7 +157,7 @@ public class Controlador implements ActionListener {
 		}
 
 		if (resultadoId != 0) {
-			 metodos.guardarCiclo(8, "ELECRONICA");
+			// metodos.guardarCiclo(8, "ELECRONICA");
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
 					JOptionPane.INFORMATION_MESSAGE);
 
