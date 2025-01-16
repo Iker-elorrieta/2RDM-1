@@ -22,20 +22,22 @@ public class HiloServidor extends Thread {
 			ObjectOutputStream salidaLogin = new ObjectOutputStream(cliente.getOutputStream());
 
 			Datos datosLogin = (Datos) entradaLogin.readObject();
-			
-			if(datosLogin.getOperacion().equals("login")) {
-				salidaLogin.writeObject(metodos.login(datosLogin.getUsername(),datosLogin.getContrasenna()));
+
+			//System.out.println(datosLogin.getUsername() + "aaaaaaa");
+
+			if (datosLogin.getOperacion().equals("login")) {
+				salidaLogin.writeObject(metodos.login(datosLogin.getUsername(), datosLogin.getContrasenna()));
 				salidaLogin.flush();
-				
-			}else if(datosLogin.getOperacion().equals("registro")) {
-				
+
+			} else if (datosLogin.getOperacion().equals("registro")) {
+
 			}
-			
+
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

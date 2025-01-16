@@ -19,8 +19,7 @@ public class Controlador implements ActionListener {
 	private vista.PanelHorario vistaHorario;
 	private vista.PanelOtrosHorarios vistaOtrosHorarios;
 	private vista.PanelReuniones vistaReuniones;
-	private Socket socket=null;
-
+	private Socket socket = null;
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
@@ -31,21 +30,22 @@ public class Controlador implements ActionListener {
 		this.vistaHorario = vistaHorario;
 		this.vistaOtrosHorarios = vistaOtrosHorarios;
 		this.vistaReuniones = vistaReuniones;
-		
+
 		this.iniciarConexionConServidor();
 		this.inicializarControlador();
 	}
 
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
-		String ip = "10.5.13.47";
+		String ip = "10.5.13.46";
 		try {
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado al servidor.");
-			
-			
-		} catch (IOException e) { e.printStackTrace(); }
-			
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public Controlador() {
@@ -122,8 +122,6 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-
-
 	public void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
@@ -131,19 +129,19 @@ public class Controlador implements ActionListener {
 	public void login() {
 		String user = vistaLogin.getTxtFUser().getText();
 		String pswd = new String(vistaLogin.getPswdFPassword().getPassword());
-		
+
 		if (user.isEmpty() || pswd.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Rellene todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		
+
 		int resultadoId = 0;
-		Datos datosLogin = new Datos("login",null,user,pswd);
-		
+		Datos datosLogin = new Datos("login", null, user, pswd);
+
 		try {
 			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
-			
+
 			salidaDatosLogin.writeObject(datosLogin);
 			salidaDatosLogin.flush();
 
@@ -151,8 +149,7 @@ public class Controlador implements ActionListener {
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
-		
+
 		if (resultadoId != 0) {
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
 					JOptionPane.INFORMATION_MESSAGE);
@@ -168,11 +165,11 @@ public class Controlador implements ActionListener {
 			JOptionPane.showMessageDialog(null, "No se ha podido completar el login. Inténtelo de nuevo.", "Error",
 					JOptionPane.ERROR_MESSAGE);
 		}
-		
+
 		clearLogin();
-		
+
 	}
-	
+
 	public void clearLogin() {
 		vistaLogin.getTxtFUser().setText("");
 		vistaLogin.getPswdFPassword().setText("");

@@ -19,13 +19,13 @@ public class Servidor {
 			while (disponible) {
 				socket = serverSocket.accept();
 				System.out.println("Cliente conectado.");
-				
+
 				HiloServidor hiloLogin = new HiloServidor(socket);
 				hiloLogin.start();
-				
-				//leer JSON
+
+				// leer JSON
 				metodos.conectarJSON();
-				
+
 			}
 
 			socket.close();
@@ -34,6 +34,6 @@ public class Servidor {
 			e.printStackTrace();
 		}
 
-	}	
+	}
 
 }

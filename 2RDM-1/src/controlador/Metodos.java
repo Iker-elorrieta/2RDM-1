@@ -27,13 +27,13 @@ public class Metodos {
 		try {
 			FileReader fr = new FileReader(url);
 			JsonElement datos = parser.parse(fr);
-			
+
 			parser(datos);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void parser(JsonElement datos) {
 		if (datos.isJsonArray()) {
 
@@ -75,40 +75,36 @@ public class Metodos {
 
 	}
 
-	/*public void guardarCiclo(int id, String nombre) {
-		Transaction tx = null;
-		tx =session.beginTransaction();
-		Ciclos newCiclo = new Ciclos();
-		newCiclo.setId(id);
-		newCiclo.setNombre(nombre);
-		session.save(newCiclo);
-		tx.commit();
-		
-	}*/
-	
+	/*
+	 * public void guardarCiclo(int id, String nombre) { Transaction tx = null; tx
+	 * =session.beginTransaction(); Ciclos newCiclo = new Ciclos();
+	 * newCiclo.setId(id); newCiclo.setNombre(nombre); session.save(newCiclo);
+	 * tx.commit();
+	 * 
+	 * }
+	 */
+
 	public int login(String user, String pswd) {
-		
-		String hql ="FROM Users WHERE username='"+user+"' AND password='"+pswd+"'";
-        Query q = session.createQuery(hql);
-        Users usuario = (Users) q.uniqueResult();
-        if(usuario==null) {
-    		return 0;
-        }else {
-    		return usuario.getId();	
-        }
+
+		String hql = "FROM Users WHERE username='" + user + "' AND password='" + pswd + "' AND tipo_id!='" + 4 + "'";
+		Query q = session.createQuery(hql);
+		Users usuario = (Users) q.uniqueResult();
+		if (usuario == null) {
+			return 0;
+		} else {
+			return usuario.getId();
+		}
 	}
 
-	/*public void pruebaSentenciaHQL() {
-		String hql ="FROM Ciclos";
-        Query q = session.createQuery(hql);
-        List<Ciclos> listaCiclos = q.list();
-
-        
-        for(int i =0;i<listaCiclos.size();i++) {
-        	Ciclos ciclo =listaCiclos.get(i);
-        	System.out.println(ciclo.getNombre());
-        }
-		
-	}*/
+	/*
+	 * public void pruebaSentenciaHQL() { String hql ="FROM Ciclos"; Query q =
+	 * session.createQuery(hql); List<Ciclos> listaCiclos = q.list();
+	 * 
+	 * 
+	 * for(int i =0;i<listaCiclos.size();i++) { Ciclos ciclo =listaCiclos.get(i);
+	 * System.out.println(ciclo.getNombre()); }
+	 * 
+	 * }
+	 */
 
 }

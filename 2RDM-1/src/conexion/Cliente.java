@@ -9,7 +9,7 @@ public class Cliente {
 		int puerto = 2000;
 
 		try {
-			Socket socket = new Socket("10.5.13.47", puerto);
+			Socket socket = new Socket("localhost", puerto);
 			System.out.println("Conectado al servidor.");
 			
 			socket.close();
