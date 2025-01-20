@@ -194,6 +194,7 @@ public class Controlador implements ActionListener {
 
 		for (byte b : resumen) {
 			resumenString.append(String.format("%02x", b));
+			
 		}
 
 		return resumenString.toString();
