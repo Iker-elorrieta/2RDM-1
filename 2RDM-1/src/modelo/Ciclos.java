@@ -63,7 +63,7 @@ public class Ciclos implements java.io.Serializable {
 		this.moduloses = moduloses;
 	}
 
-	public static String guardarCiclo(int id, String nombre, Session session) {
+	public String guardarCiclo(int id, String nombre, Session session) {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
