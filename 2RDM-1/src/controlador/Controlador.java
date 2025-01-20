@@ -210,31 +210,18 @@ public class Controlador implements ActionListener {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
-			// Enviar la solicitud con el ID del usuario
 			String[] horario = { "horario", usuarioLogeado.getId() + "" };
+
 			salida.writeObject(String.join(",", horario));
-			salida.flush();
 
-			// Recibir la lista de horarios
-			List<Horarios> horarios = (List<Horarios>) entrada.readObject(); // Recibe la lista de Horarios
+			@SuppressWarnings("unchecked")
+			List<Horarios> horarios = (List<Horarios>) entrada.readObject();
 
-			// Imprimir los detalles de los horarios
 			for (Horarios horarioIndividual : horarios) {
-				// Acceder a los datos de HorariosId
-				System.out.println("Horario cargado: " + horarioIndividual.getId().getDia() + " "
-						+ horarioIndividual.getId().getHora());
-
-				// Acceder a los datos de Users (Profesor)
-				Users profesor = horarioIndividual.getUsers();
-				System.out.println("Profesor: " + profesor.getUsername() + " (ID: " + profesor.getId() + ")");
-
-				// Acceder a los datos de Modulos
-				Modulos modulo = horarioIndividual.getModulos();
-				System.out.println("Módulo: " + modulo.getNombre() + " (ID: " + modulo.getId() + ")");
-
-				System.out.println("----------------------------------------");
+				System.out.println("Dia: " + horarioIndividual.getId().getDia());
+				System.out.println("Hora: " + horarioIndividual.getId().getHora());
+				System.out.println("Modulo: " + horarioIndividual.getModulos().getNombre());
 			}
-
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
 		}

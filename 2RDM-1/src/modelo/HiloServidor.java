@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
+	private final String login = "login", horario = "horario";
 
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
@@ -34,7 +35,7 @@ public class HiloServidor extends Thread {
 				// LEER DATOS DEL CLIENTE (CONTROLADOR)
 				datosRecibidos = ((String) entrada.readObject()).split(",");
 
-				if (datosRecibidos[0].equals("login")) {
+				if (datosRecibidos[0].equals(login)) {
 
 					Users usuario = new Users();
 					usuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
@@ -49,7 +50,7 @@ public class HiloServidor extends Thread {
 					salida.writeObject(usuario);
 					salida.flush();
 
-				} else if (datosRecibidos[0].equals("horario")) {
+				} else if (datosRecibidos[0].equals(horario)) {
 					Horarios h = new Horarios();
 
 					List<Horarios> horarios = new ArrayList<>();
