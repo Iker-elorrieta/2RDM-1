@@ -23,11 +23,12 @@ public class Servidor {
 				HiloServidor hiloLogin = new HiloServidor(socket);
 				hiloLogin.start();
 
-				// leer JSON
 				metodos.conectarJSON();
-				
-				
+				System.out.println("JSON leido");
+
+
 			}
+			System.out.println("Cliente desconectado.");
 
 			socket.close();
 			serverSocket.close();
