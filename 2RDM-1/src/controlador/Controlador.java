@@ -2,13 +2,15 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.swing.JOptionPane;
+
+import modelo.Users;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -130,28 +132,37 @@ public class Controlador implements ActionListener {
 	public void login() {
 		String user = vistaLogin.getTxtFUser().getText();
 		String pswd = new String(vistaLogin.getPswdFPassword().getPassword());
+		Users usuariaLogeado=null;
 
 		if (user.isEmpty() || pswd.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Rellene todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		int resultadoId = 0;
 
 		try {
-			DataOutputStream salidaDatosLogin = new DataOutputStream(socket.getOutputStream());
-			DataInputStream entradaResultadoLogin = new DataInputStream(socket.getInputStream());
+			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosLogin = { "login", hash(user), hash(pswd) };
 
-			salidaDatosLogin.writeUTF(String.join(",", datosLogin));// Envia datosLogin separado por comas
+			
+			salidaDatosLogin.writeObject(String.join(",", datosLogin));
+			
+			
+			usuariaLogeado = (Users) entradaResultadoLogin.readObject();
+			
+			
 
-			resultadoId = (int) entradaResultadoLogin.readInt();
-		} catch (IOException | NoSuchAlgorithmException e) {
+			//resultadoId = (int) entradaResultadoLogin.readInt();
+		} catch (IOException | NoSuchAlgorithmException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
-		if (resultadoId != 0) {
+		
+		
+		
+		if (usuariaLogeado != null) {
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
 					JOptionPane.INFORMATION_MESSAGE);
 
@@ -160,13 +171,13 @@ public class Controlador implements ActionListener {
 
 			actionPerformed(e);
 
-		} else if (resultadoId == 0) {
+		} else if (usuariaLogeado == null) {
 			JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
 
-		} else {
+		} /*else {
 			JOptionPane.showMessageDialog(null, "No se ha podido completar el login. Inténtelo de nuevo.", "Error",
 					JOptionPane.ERROR_MESSAGE);
-		}
+		}*/
 
 		clearLogin();
 
