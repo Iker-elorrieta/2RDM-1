@@ -65,6 +65,7 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.getBtnLogin().addActionListener(this);
 		this.vistaLogin.getBtnLogin().setActionCommand(Principal.enumAcciones.LOGIN_INICIAR_SESION.toString());
 
+		this.vistaLogin.getRootPane().setDefaultButton(this.vistaLogin.getBtnLogin());
 	}
 
 	private void accionesVistaMenu() {
@@ -109,6 +110,7 @@ public class Controlador implements ActionListener {
 			visualizarPanel(Principal.enumAcciones.PANEL_MENU);
 			break;
 		case PANEL_HORARIO:
+			cargarHorarioProfe();
 			visualizarPanel(Principal.enumAcciones.PANEL_HORARIO);
 			break;
 		case PANEL_OTROS_HORARIOS:
@@ -191,6 +193,10 @@ public class Controlador implements ActionListener {
 		}
 
 		return resumenString.toString();
+	}
+
+	public void cargarHorarioProfe() {
+
 	}
 
 }

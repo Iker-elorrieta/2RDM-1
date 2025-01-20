@@ -33,8 +33,14 @@ public class HiloServidor extends Thread {
 				datosRecibidos = entrada.readUTF().split(",");
 
 				if (datosRecibidos[0].equals("login")) {
-					Users usuario = new Users();
-					int idUsuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
+					Users u = new Users();
+					u = u.login(datosRecibidos[1], datosRecibidos[2], session);
+
+					int idUsuario = u.getId();
+
+					if (u.getTipos().getId() == 4)
+						JOptionPane.showMessageDialog(null, "No pueden acceder alumnos a la aplicación.", "Error",
+								JOptionPane.INFORMATION_MESSAGE);
 
 					if (idUsuario != 0) {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
