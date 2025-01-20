@@ -1,11 +1,11 @@
 package modelo;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -31,7 +31,7 @@ public class HiloServidor extends Thread {
 				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
-				// Lee los datos del cliente
+				// LEER DATOS DEL CLIENTE (CONTROLADOR)
 				datosRecibidos = ((String) entrada.readObject()).split(",");
 
 				if (datosRecibidos[0].equals("login")) {
@@ -42,16 +42,21 @@ public class HiloServidor extends Thread {
 					if (usuario != null) {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
 						if (!resultadoGuardado.equals(""))
-							JOptionPane.showMessageDialog(null, resultadoGuardado, "Error",
+							JOptionPane.showMessageDialog(null, resultadoGuardado, "Información",
 									JOptionPane.INFORMATION_MESSAGE);
-
 					}
 
 					salida.writeObject(usuario);
 					salida.flush();
 
-				} else if (datosRecibidos[0].equals("registro")) {
+				} else if (datosRecibidos[0].equals("horario")) {
+					Horarios h = new Horarios();
 
+					List<Horarios> horarios = new ArrayList<>();
+					horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
+
+					salida.writeObject(horarios);
+					salida.flush();
 				}
 			}
 

@@ -8,8 +8,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
 import javax.swing.JOptionPane;
 
+import modelo.Horarios;
+import modelo.Modulos;
 import modelo.Users;
 import vista.Principal;
 
@@ -21,6 +25,9 @@ public class Controlador implements ActionListener {
 	private vista.PanelOtrosHorarios vistaOtrosHorarios;
 	private vista.PanelReuniones vistaReuniones;
 	private Socket socket = null;
+	private Users usuarioLogeado = null;
+
+	private int usuarioNoAdmitidoId = 4;
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
@@ -134,13 +141,11 @@ public class Controlador implements ActionListener {
 	public void login() {
 		String user = vistaLogin.getTxtFUser().getText();
 		String pswd = new String(vistaLogin.getPswdFPassword().getPassword());
-		Users usuariaLogeado=null;
 
 		if (user.isEmpty() || pswd.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Rellene todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-
 
 		try {
 			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
@@ -148,38 +153,32 @@ public class Controlador implements ActionListener {
 
 			String[] datosLogin = { "login", hash(user), hash(pswd) };
 
-			
 			salidaDatosLogin.writeObject(String.join(",", datosLogin));
-			
-			
-			usuariaLogeado = (Users) entradaResultadoLogin.readObject();
-			
-			
 
-			//resultadoId = (int) entradaResultadoLogin.readInt();
+			usuarioLogeado = (Users) entradaResultadoLogin.readObject();
+
+			if (usuarioLogeado == null) {
+				JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error",
+						JOptionPane.ERROR_MESSAGE);
+
+			} else if (usuarioLogeado.getTipos().getId() == usuarioNoAdmitidoId) {
+				JOptionPane.showMessageDialog(null, "El uso de la aplicación es exclusivo de profesores", "Error",
+						JOptionPane.ERROR_MESSAGE);
+
+			} else {
+				JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
+						JOptionPane.INFORMATION_MESSAGE);
+
+				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
+						Principal.enumAcciones.PANEL_MENU.toString());
+
+				actionPerformed(e);
+
+			}
+
 		} catch (IOException | NoSuchAlgorithmException | ClassNotFoundException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error al iniciar sesión", "Error", JOptionPane.ERROR_MESSAGE);
 		}
-
-		
-		
-		
-		if (usuariaLogeado != null) {
-			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
-					JOptionPane.INFORMATION_MESSAGE);
-
-			ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
-					Principal.enumAcciones.PANEL_MENU.toString());
-
-			actionPerformed(e);
-
-		} else if (usuariaLogeado == null) {
-			JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
-
-		} /*else {
-			JOptionPane.showMessageDialog(null, "No se ha podido completar el login. Inténtelo de nuevo.", "Error",
-					JOptionPane.ERROR_MESSAGE);
-		}*/
 
 		clearLogin();
 
@@ -207,7 +206,38 @@ public class Controlador implements ActionListener {
 	}
 
 	public void cargarHorarioProfe() {
+		try {
+			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
+			// Enviar la solicitud con el ID del usuario
+			String[] horario = { "horario", usuarioLogeado.getId() + "" };
+			salida.writeObject(String.join(",", horario));
+			salida.flush();
+
+			// Recibir la lista de horarios
+			List<Horarios> horarios = (List<Horarios>) entrada.readObject(); // Recibe la lista de Horarios
+
+			// Imprimir los detalles de los horarios
+			for (Horarios horarioIndividual : horarios) {
+				// Acceder a los datos de HorariosId
+				System.out.println("Horario cargado: " + horarioIndividual.getId().getDia() + " "
+						+ horarioIndividual.getId().getHora());
+
+				// Acceder a los datos de Users (Profesor)
+				Users profesor = horarioIndividual.getUsers();
+				System.out.println("Profesor: " + profesor.getUsername() + " (ID: " + profesor.getId() + ")");
+
+				// Acceder a los datos de Modulos
+				Modulos modulo = horarioIndividual.getModulos();
+				System.out.println("Módulo: " + modulo.getNombre() + " (ID: " + modulo.getId() + ")");
+
+				System.out.println("----------------------------------------");
+			}
+
+		} catch (IOException | ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 }
