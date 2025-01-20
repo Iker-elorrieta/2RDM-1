@@ -13,6 +13,7 @@ import org.hibernate.SessionFactory;
 public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
+	private final String login = "login", registro = "registro";
 
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
@@ -32,7 +33,7 @@ public class HiloServidor extends Thread {
 				// Lee los datos del cliente
 				datosRecibidos = entrada.readUTF().split(",");
 
-				if (datosRecibidos[0].equals("login")) {
+				if (datosRecibidos[0].equals(login)) {
 					Users usuario = new Users();
 					int idUsuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
 
@@ -47,7 +48,7 @@ public class HiloServidor extends Thread {
 					salida.writeInt(idUsuario);
 					salida.flush();
 
-				} else if (datosRecibidos[0].equals("registro")) {
+				} else if (datosRecibidos[0].equals(registro)) {
 
 				}
 			}
