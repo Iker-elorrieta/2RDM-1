@@ -25,7 +25,8 @@ public class Servidor {
 
 				// leer JSON
 				metodos.conectarJSON();
-
+				
+				
 			}
 
 			socket.close();

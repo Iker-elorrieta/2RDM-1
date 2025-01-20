@@ -3,6 +3,8 @@ package modelo;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import javax.swing.JOptionPane;
@@ -26,23 +28,18 @@ public class HiloServidor extends Thread {
 		try {
 
 			while (true) {
-				DataInputStream entrada = new DataInputStream(cliente.getInputStream());
-				DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
+				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
+				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
 				// Lee los datos del cliente
-				datosRecibidos = entrada.readUTF().split(",");
+				datosRecibidos = ((String) entrada.readObject()).split(",");
 
 				if (datosRecibidos[0].equals("login")) {
-					Users u = new Users();
-					u = u.login(datosRecibidos[1], datosRecibidos[2], session);
 
-					int idUsuario = u.getId();
+					Users usuario = new Users();
+					usuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
 
-					if (u.getTipos().getId() == 4)
-						JOptionPane.showMessageDialog(null, "No pueden acceder alumnos a la aplicación.", "Error",
-								JOptionPane.INFORMATION_MESSAGE);
-
-					if (idUsuario != 0) {
+					if (usuario != null) {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
 						if (!resultadoGuardado.equals(""))
 							JOptionPane.showMessageDialog(null, resultadoGuardado, "Error",
@@ -50,7 +47,7 @@ public class HiloServidor extends Thread {
 
 					}
 
-					salida.writeInt(idUsuario);
+					salida.writeObject(usuario);
 					salida.flush();
 
 				} else if (datosRecibidos[0].equals("registro")) {
@@ -58,7 +55,7 @@ public class HiloServidor extends Thread {
 				}
 			}
 
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
