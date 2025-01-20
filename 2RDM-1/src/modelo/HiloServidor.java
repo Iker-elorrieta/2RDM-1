@@ -38,7 +38,8 @@ public class HiloServidor extends Thread {
 					int idUsuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
 
 					if (idUsuario != 0) {
-						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
+						Ciclos ciclo = new Ciclos();
+						String resultadoGuardado = ciclo.guardarCiclo(8, "ELECRONICA", session);
 						if (!resultadoGuardado.equals(""))
 							JOptionPane.showMessageDialog(null, resultadoGuardado, "Error",
 									JOptionPane.INFORMATION_MESSAGE);
