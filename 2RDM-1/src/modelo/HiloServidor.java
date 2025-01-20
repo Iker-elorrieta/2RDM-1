@@ -43,7 +43,6 @@ public class HiloServidor extends Thread {
 						if (!resultadoGuardado.equals(""))
 							JOptionPane.showMessageDialog(null, resultadoGuardado, "Error",
 									JOptionPane.INFORMATION_MESSAGE);
-
 					}
 
 					salida.writeInt(idUsuario);
