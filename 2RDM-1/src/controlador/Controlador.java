@@ -13,8 +13,8 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import modelo.Horarios;
-import modelo.Modulos;
 import modelo.Users;
+import vista.PanelHorario;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -26,6 +26,7 @@ public class Controlador implements ActionListener {
 	private vista.PanelReuniones vistaReuniones;
 	private Socket socket = null;
 	private Users usuarioLogeado = null;
+	private PanelHorario panelHorario;
 
 	private int usuarioNoAdmitidoId = 4;
 
@@ -119,8 +120,8 @@ public class Controlador implements ActionListener {
 			visualizarPanel(Principal.enumAcciones.PANEL_MENU);
 			break;
 		case PANEL_HORARIO:
-			cargarHorarioProfe();
 			visualizarPanel(Principal.enumAcciones.PANEL_HORARIO);
+			cargarHorarioProfe();
 			break;
 		case PANEL_OTROS_HORARIOS:
 			visualizarPanel(Principal.enumAcciones.PANEL_OTROS_HORARIOS);
@@ -206,6 +207,10 @@ public class Controlador implements ActionListener {
 	}
 
 	public void cargarHorarioProfe() {
+		if (panelHorario == null) {
+			panelHorario = new PanelHorario();
+		}
+
 		try {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
@@ -217,13 +222,33 @@ public class Controlador implements ActionListener {
 			@SuppressWarnings("unchecked")
 			List<Horarios> horarios = (List<Horarios>) entrada.readObject();
 
-			for (Horarios horarioIndividual : horarios) {
-				System.out.println("Dia: " + horarioIndividual.getId().getDia());
-				System.out.println("Hora: " + horarioIndividual.getId().getHora());
-				System.out.println("Modulo: " + horarioIndividual.getModulos().getNombre());
+			if (horarios == null || horarios.isEmpty()) {
+				System.out.println("No se han encontrado horarios.");
+				return;
 			}
+
+			Object[][] data = new Object[horarios.size()][3];
+
+			for (int i = 0; i < horarios.size(); i++) {
+				Horarios horarioIndividual = horarios.get(i);
+
+				System.out.println("Horarios recibidos: " + horarioIndividual);
+
+				data[i][0] = horarioIndividual.getId().getDia();
+				data[i][1] = horarioIndividual.getId().getHora();
+				data[i][2] = horarioIndividual.getModulos().getNombre();
+			}
+
+			panelHorario.actualizarTabla(data);
+
+			System.out.println("Datos a mostrar en la tabla:");
+			for (int i = 0; i < data.length; i++) {
+				System.out.println("Día: " + data[i][0] + ", Hora: " + data[i][1] + ", Módulo: " + data[i][2]);
+			}
+
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 		}
 	}
 
