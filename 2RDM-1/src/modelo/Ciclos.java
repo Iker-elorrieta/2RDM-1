@@ -62,16 +62,30 @@ public class Ciclos implements java.io.Serializable {
 	public void setModuloses(Set moduloses) {
 		this.moduloses = moduloses;
 	}
-	
-	public static void guardarCiclo(int id, String nombre,Session session) {
-		Transaction tx = null;
-		tx = session.beginTransaction();
-		Ciclos newCiclo = new Ciclos();
-		newCiclo.setId(id);
-		newCiclo.setNombre(nombre);
-		session.save(newCiclo);
-		tx.commit();
 
+	public static String guardarCiclo(int id, String nombre, Session session) {
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+
+			Ciclos existingCiclo = session.get(Ciclos.class, id);
+			if (existingCiclo != null) {
+				return "El ciclo con ID " + id + " ya existe.";
+			}
+
+			Ciclos newCiclo = new Ciclos();
+			newCiclo.setId(id);
+			newCiclo.setNombre(nombre);
+
+			session.save(newCiclo);
+
+			tx.commit();
+			return "";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return e.toString();
+		}
 	}
 
 }

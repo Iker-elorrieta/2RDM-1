@@ -20,7 +20,6 @@ public class Controlador implements ActionListener {
 	private vista.PanelReuniones vistaReuniones;
 	private Socket socket = null;
 
-
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
 			vista.PanelReuniones vistaReuniones) {
@@ -30,10 +29,10 @@ public class Controlador implements ActionListener {
 		this.vistaHorario = vistaHorario;
 		this.vistaOtrosHorarios = vistaOtrosHorarios;
 		this.vistaReuniones = vistaReuniones;
-		
+
 		this.iniciarConexionConServidor();
 		this.inicializarControlador();
-		
+
 	}
 
 	private void iniciarConexionConServidor() {
@@ -150,7 +149,7 @@ public class Controlador implements ActionListener {
 			resultadoId = (int) entradaResultadoLogin.readInt();
 		} catch (IOException | NoSuchAlgorithmException e) {
 			e.printStackTrace();
-		} 
+		}
 
 		if (resultadoId != 0) {
 			JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
@@ -193,6 +192,5 @@ public class Controlador implements ActionListener {
 
 		return resumenString.toString();
 	}
-	
-	
+
 }

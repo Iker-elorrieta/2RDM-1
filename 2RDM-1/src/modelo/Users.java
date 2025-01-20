@@ -184,8 +184,8 @@ public class Users implements java.io.Serializable {
 	public void setHorarioses(Set horarioses) {
 		this.horarioses = horarioses;
 	}
-	
-	public int login(String user, String pswd,Session session) {
+
+	public int login(String user, String pswd, Session session) {
 		String hql = "FROM Users WHERE username='" + user + "' AND password='" + pswd + "' AND tipo_id!='" + 4 + "'";
 		Query q = session.createQuery(hql);
 		Users usuario = (Users) q.uniqueResult();
@@ -196,6 +196,5 @@ public class Users implements java.io.Serializable {
 
 		}
 	}
-	
-	
+
 }
