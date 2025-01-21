@@ -79,12 +79,14 @@ public class Horarios implements java.io.Serializable {
 		return horarios;
 	}
 
-	@SuppressWarnings("unchecked")
-	public ArrayList<Horarios> otrosHorarios(Session session, Users usElegido) {
+	public List<Horarios> otrosHorarios(Session session, Users usElegido) {
 		String hql = "FROM Horarios WHERE users.id="+usElegido.getId();
 		Query q = session.createQuery(hql);
+		@SuppressWarnings("unchecked")
+		List<Horarios> otrosHorarios = (List<Horarios>) q.list();
 
-		return (ArrayList<Horarios>) q.list();
+
+		return otrosHorarios;
 	}	
 
 }
