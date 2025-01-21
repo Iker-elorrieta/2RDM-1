@@ -5,13 +5,13 @@ import java.awt.Color;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
 
 public class Principal extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static enum enumAcciones {
-		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES,CARGAR_TABLA_OTROS_HORARIOS
+		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES,
+		CARGAR_TABLA_OTROS_HORARIOS
 	}
 
 	private JPanel panelContenedor;

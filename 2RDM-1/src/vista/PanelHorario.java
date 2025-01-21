@@ -7,29 +7,79 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 
+import java.awt.Component;
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+
 public class PanelHorario extends JPanel {
 
+	// ERRORES:
+	// - Cuando sales del horario y no te desconectas, no puedes volver a entrar en
+	// Otros Horarios.
+	// - Cuando inician sesión dos usuarios sin cerrar la app, se duplican sus
+	// horarios.
+
 	private static final long serialVersionUID = 1L;
+	private DefaultTableModel modeloHorario;
 	private JButton btnVolver;
 	private JTable tablaHorario;
-	private DefaultTableModel model;
 
 	public PanelHorario() {
 		setBackground(new Color(220, 220, 220));
 		setBounds(0, 0, 884, 561);
 		setLayout(null);
 
-		String[] columnas = { "Día", "Hora", "Módulo" };
-		model = new DefaultTableModel(columnas, 0);
-		tablaHorario = new JTable(model);
-		tablaHorario.setBounds(20, 20, 840, 450);
-
-		JScrollPane scrollPane = new JScrollPane(tablaHorario);
-		scrollPane.setBounds(20, 20, 840, 450);
+		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(20, 52, 841, 427);
 		add(scrollPane);
+
+		modeloHorario = new DefaultTableModel(columnas, 0);
+		tablaHorario = new JTable(modeloHorario);
+		tablaHorario.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		tablaHorario.setAutoCreateRowSorter(true);
+		tablaHorario.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tablaHorario.setRowSelectionAllowed(false);
+		tablaHorario.setCellSelectionEnabled(false);
+		tablaHorario.setRowHeight(65); // Ajusta la altura de la fila
+
+		tablaHorario.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				// Llama al renderizador por defecto
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+						column);
+
+				// Configura el texto para que se ajuste a la celda
+				label.setText(value != null ? value.toString() : "");
+				label.setOpaque(true);
+				label.setHorizontalAlignment(JLabel.LEFT);
+				label.setVerticalAlignment(JLabel.TOP); // Alinea el texto arriba de la celda
+
+				// Habilita el salto de línea en el texto
+				label.setText("<html>" + label.getText().replace("\n", "<br>") + "</html>");
+
+				// Cambia los colores según el estado de selección
+				if (isSelected) {
+					label.setBackground(table.getSelectionBackground());
+					label.setForeground(table.getSelectionForeground());
+				} else {
+					label.setBackground(table.getBackground());
+					label.setForeground(table.getForeground());
+				}
+
+				return label;
+			}
+		});
+
+		tablaHorario.setDefaultEditor(Object.class, null);
+
+		scrollPane.setViewportView(tablaHorario);
 
 		btnVolver = new JButton("Volver");
 		btnVolver.setForeground(Color.WHITE);
@@ -44,18 +94,23 @@ public class PanelHorario extends JPanel {
 		return btnVolver;
 	}
 
-	public void actualizarTabla(Object[][] data) {
-		if (data == null || data.length == 0) {
-			System.out.println("No se recibieron datos para mostrar.");
-			return;
-		}
+	public DefaultTableModel getModeloHorario() {
+		return modeloHorario;
+	}
 
-		model.setRowCount(0);
+	public void setModeloHorario(DefaultTableModel modeloHorario) {
+		this.modeloHorario = modeloHorario;
+	}
 
-		for (Object[] fila : data) {
-			model.addRow(fila);
-		}
+	public JTable getTablaHorario() {
+		return tablaHorario;
+	}
 
-		System.out.println("Tabla actualizada con " + data.length + " filas.");
+	public void setTablaHorario(JTable tablaHorario) {
+		this.tablaHorario = tablaHorario;
+	}
+
+	public void setBtnVolver(JButton btnVolver) {
+		this.btnVolver = btnVolver;
 	}
 }

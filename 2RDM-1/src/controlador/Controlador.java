@@ -293,25 +293,40 @@ public class Controlador implements ActionListener {
 				return;
 			}
 
-			Object[][] data = new Object[horarios.size()][3];
+			Object[][] data = new Object[horarios.size()][6];
+			for (int h = 1; h <= 6; h++) {
+				data[h][0] = "Hora " + h;
+			}
 
 			for (int i = 0; i < horarios.size(); i++) {
 				Horarios horarioIndividual = horarios.get(i);
+				int hora = Integer.parseInt(horarioIndividual.getId().getHora());
 
-				System.out.println("Horarios recibidos: " + horarioIndividual);
-
-				data[i][0] = horarioIndividual.getId().getDia();
-				data[i][1] = horarioIndividual.getId().getHora();
-				data[i][2] = horarioIndividual.getModulos().getNombre();
+				switch (horarioIndividual.getId().getDia()) {
+				case "L/A":
+					data[hora][1] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "M/A":
+					data[hora][2] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "X":
+					data[hora][3] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "J/O":
+					data[hora][4] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "V/O":
+					data[hora][5] = horarioIndividual.getModulos().getNombre();
+					break;
+				default:
+					break;
+				}
 			}
 
-			panelHorario.actualizarTabla(data);
-
-			System.out.println("Datos a mostrar en la tabla:");
-			for (int i = 0; i < data.length; i++) {
-				System.out.println("Día: " + data[i][0] + ", Hora: " + data[i][1] + ", Módulo: " + data[i][2]);
+			// Agregar los datos a la vista
+			for (int h = 1; h <= 6; h++) {
+				this.vistaPrincipal.getPanelHorario().getModeloHorario().addRow(data[h]);
 			}
-
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
