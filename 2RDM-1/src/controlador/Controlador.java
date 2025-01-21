@@ -8,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -27,7 +29,6 @@ public class Controlador implements ActionListener {
 	private Socket socket = null;
 	private Users usuarioLogeado = null;
 	private PanelHorario panelHorario;
-
 	private int usuarioNoAdmitidoId = 4;
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
@@ -98,6 +99,10 @@ public class Controlador implements ActionListener {
 	}
 
 	private void accionesVistaOtrosHorarios() {
+		this.vistaOtrosHorarios.getProfesComboBox().addActionListener(this);
+		this.vistaOtrosHorarios.getProfesComboBox()
+				.setActionCommand(Principal.enumAcciones.CARGAR_TABLA_OTROS_HORARIOS.toString());
+
 		this.vistaOtrosHorarios.getBtnVolver().addActionListener(this);
 		this.vistaOtrosHorarios.getBtnVolver().setActionCommand(Principal.enumAcciones.PANEL_MENU.toString());
 	}
@@ -124,15 +129,75 @@ public class Controlador implements ActionListener {
 			cargarHorarioProfe();
 			break;
 		case PANEL_OTROS_HORARIOS:
+			mCargarTodosUsuarios();
+			mCargarDatosOtrosHorarios();
 			visualizarPanel(Principal.enumAcciones.PANEL_OTROS_HORARIOS);
 			break;
 		case PANEL_REUNIONES:
 			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES);
 			break;
+		case CARGAR_TABLA_OTROS_HORARIOS:
+			this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().setRowCount(0);
+			mCargarDatosOtrosHorarios();
+			break;
 
 		default:
 			break;
 		}
+	}
+
+	private void mCargarTodosUsuarios() {
+		try {
+			ObjectOutputStream salidaTodosUsuarios = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entradaTodosUsuarios = new ObjectInputStream(socket.getInputStream());
+
+			String[] datosTodosUsuarios = { "todosUsuarios" };
+
+			salidaTodosUsuarios.writeObject(String.join(",", datosTodosUsuarios));
+			List<Users> usuarios = (List<Users>) entradaTodosUsuarios.readObject();
+
+			for (Users us : usuarios) {
+				this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
+			}
+
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void mCargarDatosOtrosHorarios() {
+		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
+				.getSelectedItem();
+
+		try {
+			ObjectOutputStream salidaDatosOtrosHorarios = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entradaResultadoOtrosHorarios = new ObjectInputStream(socket.getInputStream());
+
+			salidaDatosOtrosHorarios.writeObject(usuarioElegido);
+
+			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
+
+			String matriz[][] = new String[otrosHorarios.size()][4];
+			for (int i = 0; i < otrosHorarios.size(); i++) {
+				matriz[i][0] = (otrosHorarios.get(i).getId().getDia() != null)
+						? otrosHorarios.get(i).getId().getDia().toString()
+						: "NULL";
+				matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null)
+						? otrosHorarios.get(i).getId().getHora().toString()
+						: "NULL";
+				matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
+				matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
+
+				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
+
+			}
+
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public void visualizarPanel(Principal.enumAcciones panel) {
@@ -149,6 +214,7 @@ public class Controlador implements ActionListener {
 		}
 
 		try {
+
 			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
 

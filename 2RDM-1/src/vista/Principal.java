@@ -11,7 +11,7 @@ public class Principal extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static enum enumAcciones {
-		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES
+		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES,CARGAR_TABLA_OTROS_HORARIOS
 	}
 
 	private JPanel panelContenedor;

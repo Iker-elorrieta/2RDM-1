@@ -24,8 +24,10 @@ public class Servidor {
 				hiloLogin.start();
 
 				metodos.conectarJSON();
+				System.out.println("JSON leido");
 
 			}
+			System.out.println("Cliente desconectado.");
 
 			socket.close();
 			serverSocket.close();

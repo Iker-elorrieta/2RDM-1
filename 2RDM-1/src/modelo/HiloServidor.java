@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -16,29 +15,38 @@ public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
 	private final String login = "login", horario = "horario";
+	private boolean dividirEnComas = true;
 
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
 
 	public HiloServidor(Socket cliente) {
 		this.cliente = cliente;
+		this.dividirEnComas = true;
 	}
 
 	@Override
 	public void run() {
 		try {
 
-			while (true) {
+			while (cliente.isConnected()) {
 				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
-				// LEER DATOS DEL CLIENTE (CONTROLADOR)
-				datosRecibidos = ((String) entrada.readObject()).split(",");
+				// Lee los datos del cliente
+				if (dividirEnComas) {
+					datosRecibidos = ((String) entrada.readObject()).split(",");
+				} else {
+					datosRecibidos[0] = "otrosHorarios";
+				}
 
 				if (datosRecibidos[0].equals(login)) {
 
 					Users usuario = new Users();
-					usuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
+					usuario.setUsername(datosRecibidos[1]);
+					usuario.setPassword(datosRecibidos[2]);
+
+					usuario = usuario.login(session);
 
 					if (usuario != null) {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
@@ -48,6 +56,7 @@ public class HiloServidor extends Thread {
 					}
 
 					salida.writeObject(usuario);
+
 					salida.flush();
 
 				} else if (datosRecibidos[0].equals(horario)) {
@@ -58,7 +67,21 @@ public class HiloServidor extends Thread {
 
 					salida.writeObject(horarios);
 					salida.flush();
+
+				} else if (datosRecibidos[0].equals("todosUsuarios")) {
+					Users usuariosTodos = new Users();
+
+					salida.writeObject(usuariosTodos.todosUsers(session));
+					this.dividirEnComas = false;
+
+				} else if (datosRecibidos[0].equals("otrosHorarios")) {
+					Horarios otrosHorarios = new Horarios();
+					Users usElegido = (Users) entrada.readObject();
+
+					salida.writeObject(otrosHorarios.otrosHorarios(session, usElegido));
 				}
+
+				salida.flush();
 			}
 
 		} catch (IOException | ClassNotFoundException e) {

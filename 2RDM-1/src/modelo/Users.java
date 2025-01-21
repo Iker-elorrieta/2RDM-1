@@ -1,7 +1,9 @@
 package modelo;
 // Generated 14 ene 2025, 11:50:45 by Hibernate Tools 6.5.1.Final
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -186,11 +188,26 @@ public class Users implements java.io.Serializable {
 		this.horarioses = horarioses;
 	}
 
-	public Users login(String user, String pswd, Session session) {
-		String hql = "FROM Users WHERE username='" + user + "' AND password='" + pswd + "'";
+	public Users login(Session session) {
+		String hql = "FROM Users WHERE username='" + username + "' AND password='" + password + "' AND tipo_id!='" + 4
+				+ "'";
 		Query q = session.createQuery(hql);
 		return (Users) q.uniqueResult();
 
+	}
+
+	public List<Users> todosUsers(Session session) {
+		String hql = "FROM Users";
+		Query q = session.createQuery(hql);
+		List<Users> usuariosTodos = new ArrayList<Users>();
+		usuariosTodos = q.list();
+		return usuariosTodos;
+
+	}
+
+	@Override
+	public String toString() {
+		return nombre;
 	}
 
 }
