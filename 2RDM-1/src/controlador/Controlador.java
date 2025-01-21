@@ -130,7 +130,6 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_OTROS_HORARIOS:
 			mCargarTodosUsuarios();
-			mCargarDatosOtrosHorarios();
 			visualizarPanel(Principal.enumAcciones.PANEL_OTROS_HORARIOS);
 			break;
 		case PANEL_REUNIONES:
@@ -146,6 +145,7 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void mCargarTodosUsuarios() {
 		try {
 			ObjectOutputStream salidaTodosUsuarios = new ObjectOutputStream(socket.getOutputStream());
@@ -169,32 +169,32 @@ public class Controlador implements ActionListener {
 	private void mCargarDatosOtrosHorarios() {
 		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
 				.getSelectedItem();
-
 		try {
 			ObjectOutputStream salidaDatosOtrosHorarios = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entradaResultadoOtrosHorarios = new ObjectInputStream(socket.getInputStream());
-
-			salidaDatosOtrosHorarios.writeObject(usuarioElegido);
+			
+			String[] datosOtrosHorarios = { "otrosHorarios",Integer.toString(usuarioElegido.getId())};
+			salidaDatosOtrosHorarios.writeObject(String.join(",", datosOtrosHorarios));
 
 			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
 
-			String matriz[][] = new String[otrosHorarios.size()][4];
-			for (int i = 0; i < otrosHorarios.size(); i++) {
-				matriz[i][0] = (otrosHorarios.get(i).getId().getDia() != null)
-						? otrosHorarios.get(i).getId().getDia().toString()
-						: "NULL";
-				matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null)
-						? otrosHorarios.get(i).getId().getHora().toString()
-						: "NULL";
-				matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
-				matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
+			String matriz[][] = new String[otrosHorarios.size()][];
+			
+			//for (int i = 0; i < otrosHorarios.size(); i++) {
+				
+				//matriz[i][0] = (otrosHorarios.get(i).getId().getDia().toString() != null)? otrosHorarios.get(i).getId().getDia().toString(): "NULL";
+				
+				//matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null) ? otrosHorarios.get(i).getId().getHora().toString() : "NULL";
+				
+				//matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
+				
+				//matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
 
-				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
+				//this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
 
-			}
+			//}
 
 		} catch (IOException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

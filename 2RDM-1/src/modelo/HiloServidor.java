@@ -15,14 +15,12 @@ public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
 	private final String login = "login", horario = "horario";
-	private boolean dividirEnComas = true;
 
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
 
 	public HiloServidor(Socket cliente) {
 		this.cliente = cliente;
-		this.dividirEnComas = true;
 	}
 
 	@Override
@@ -34,11 +32,7 @@ public class HiloServidor extends Thread {
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
 				// Lee los datos del cliente
-				if (dividirEnComas) {
 					datosRecibidos = ((String) entrada.readObject()).split(",");
-				} else {
-					datosRecibidos[0] = "otrosHorarios";
-				}
 
 				if (datosRecibidos[0].equals(login)) {
 
@@ -70,13 +64,13 @@ public class HiloServidor extends Thread {
 
 				} else if (datosRecibidos[0].equals("todosUsuarios")) {
 					Users usuariosTodos = new Users();
-
 					salida.writeObject(usuariosTodos.todosUsers(session));
-					this.dividirEnComas = false;
 
 				} else if (datosRecibidos[0].equals("otrosHorarios")) {
 					Horarios otrosHorarios = new Horarios();
-					Users usElegido = (Users) entrada.readObject();
+					Users usElegido = new Users();
+
+					usElegido.setId(Integer.parseInt(datosRecibidos[1]));
 
 					salida.writeObject(otrosHorarios.otrosHorarios(session, usElegido));
 				}
