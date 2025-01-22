@@ -428,7 +428,6 @@ public class Controlador implements ActionListener {
 				}
 			}
 
-			// Agregar los datos a la vista
 			for (int h = 1; h <= 6; h++) {
 				this.vistaPrincipal.getPanelHorario().getModeloHorario().addRow(data[h]);
 			}
