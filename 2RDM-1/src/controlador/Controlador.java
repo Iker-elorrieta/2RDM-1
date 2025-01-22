@@ -209,9 +209,11 @@ public class Controlador implements ActionListener {
 			salidaTodosUsuarios.writeObject(String.join(",", datosTodosUsuarios));
 			List<Users> usuarios = (List<Users>) entradaTodosUsuarios.readObject();
 
-			for (Users us : usuarios) {
-				this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
-			}
+			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0)
+				for (Users us : usuarios) {
+					if (us.getTipos().getId() != usuarioNoAdmitidoId)
+						this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
+				}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -237,7 +239,8 @@ public class Controlador implements ActionListener {
 			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
 
 			if (otrosHorarios == null || otrosHorarios.isEmpty()) {
-				System.out.println("No se han encontrado horarios.");
+				JOptionPane.showMessageDialog(null, "No se han encontrado horarios para mostrar", "Aviso",
+						JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
@@ -390,7 +393,8 @@ public class Controlador implements ActionListener {
 			List<Horarios> horarios = (List<Horarios>) entrada.readObject();
 
 			if (horarios == null || horarios.isEmpty()) {
-				System.out.println("No se han encontrado horarios.");
+				JOptionPane.showMessageDialog(null, "No se han encontrado horarios para mostrar", "Aviso",
+						JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
