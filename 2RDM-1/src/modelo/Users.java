@@ -195,6 +195,7 @@ public class Users implements java.io.Serializable {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Users> todosUsers(Session session) {
 		String hql = "FROM Users";
 		Query q = session.createQuery(hql);

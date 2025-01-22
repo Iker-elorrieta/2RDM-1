@@ -14,8 +14,9 @@ import org.hibernate.SessionFactory;
 public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
+
 	private final String login = "login", horario = "horario", todosUsuarios = "todosUsuarios",
-			otrosHorarios = "otrosHorarios";
+			otrosHorarios = "otrosHorarios", reuniones = "reuniones";
 
 	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private static Session session = sesion.openSession();
@@ -36,7 +37,6 @@ public class HiloServidor extends Thread {
 				datosRecibidos = ((String) entrada.readObject()).split(",");
 
 				if (datosRecibidos[0].equals(login)) {
-
 					Users usuario = new Users();
 					usuario.setUsername(datosRecibidos[1]);
 					usuario.setPassword(datosRecibidos[2]);
@@ -52,18 +52,17 @@ public class HiloServidor extends Thread {
 
 					salida.writeObject(usuario);
 
-					salida.flush();
-
 				} else if (datosRecibidos[0].equals(horario)) {
+
 					Horarios h = new Horarios();
 
 					List<Horarios> horarios = new ArrayList<>();
 					horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
 
 					salida.writeObject(horarios);
-					salida.flush();
 
 				} else if (datosRecibidos[0].equals(todosUsuarios)) {
+
 					Users usuariosTodos = new Users();
 					salida.writeObject(usuariosTodos.todosUsers(session));
 
@@ -75,6 +74,14 @@ public class HiloServidor extends Thread {
 
 					salida.writeObject(
 							otrosHorarios.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session));
+
+				} else if (datosRecibidos[0].equals(reuniones)) {
+					Reuniones reu = new Reuniones();
+					Users uProfe = new Users();
+					uProfe.setId(Integer.parseInt(datosRecibidos[1]));
+					reu.setUsersByProfesorId(uProfe);
+
+					salida.writeObject(reu.reuniones(session));
 				}
 
 				salida.flush();

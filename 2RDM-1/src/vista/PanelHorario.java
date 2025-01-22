@@ -17,6 +17,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class PanelHorario extends JPanel {
 
+	// ERRORES:
+	// - Cuando sales del horario y no te desconectas, no puedes volver a entrar en
+	// Otros Horarios.
+	// - Cuando inician sesión dos usuarios sin cerrar la app, se duplican sus
+	// horarios.
+
 	private static final long serialVersionUID = 1L;
 	private DefaultTableModel modeloHorario;
 	private JButton btnVolver;
@@ -29,6 +35,7 @@ public class PanelHorario extends JPanel {
 
 		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
 		JScrollPane scrollPane = new JScrollPane();
+
 		scrollPane.setBounds(20, 52, 841, 425);
 		add(scrollPane);
 
@@ -41,7 +48,6 @@ public class PanelHorario extends JPanel {
 		tablaHorario.setCellSelectionEnabled(false);
 		tablaHorario.setRowHeight(67);
 		tablaHorario.getColumnModel().getColumn(0).setMaxWidth(70);
-
 
 		tablaHorario.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 4045963045190976386L;
@@ -57,7 +63,6 @@ public class PanelHorario extends JPanel {
 				label.setHorizontalAlignment(JLabel.LEFT);
 				label.setVerticalAlignment(JLabel.TOP);
 				label.setText("<html>" + label.getText().replace("\n", "<br>") + "</html>");
-
 				return label;
 			}
 		});
