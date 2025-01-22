@@ -28,7 +28,7 @@ public class PanelOtrosHorarios extends JPanel {
 		setBounds(0, 0, 884, 561);
 		setLayout(null);
 		
-		String columnas[] = { "Dia","Hora","Profe Id","Modulo Id"};
+		String columnas[] = { "Id","Estado","Profesor Id","Alumno Id"};
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(230, 70, 572, 409);
 		add(scrollPane);

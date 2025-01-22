@@ -8,16 +8,13 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JOptionPane;
-
 import modelo.Horarios;
-import modelo.Users;
 import vista.PanelHorario;
 import vista.Principal;
+import modelo.Reuniones;
+import modelo.Users;
 
 public class Controlador implements ActionListener {
 	private vista.Principal vistaPrincipal;
@@ -46,6 +43,9 @@ public class Controlador implements ActionListener {
 
 	}
 
+	/**
+	 * Metodo que hace la conexion con el Servidor
+	 */
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
 		// String ip = "10.5.13.47";
@@ -69,7 +69,6 @@ public class Controlador implements ActionListener {
 		accionesVistaHorario();
 		accionesVistaOtrosHorarios();
 		accionesVistaReuniones();
-
 	}
 
 	private void accionesVistaLogin() {
@@ -130,9 +129,12 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_OTROS_HORARIOS:
 			mCargarTodosUsuarios();
+			mCargarDatosOtrosHorarios();
 			visualizarPanel(Principal.enumAcciones.PANEL_OTROS_HORARIOS);
 			break;
 		case PANEL_REUNIONES:
+			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
+			mCargarReuniones();
 			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES);
 			break;
 		case CARGAR_TABLA_OTROS_HORARIOS:
@@ -145,6 +147,56 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista de
+	 * las Reuniones y mostrarlos en una tabla.
+	 */
+	private void mCargarReuniones() {
+		try {
+			ObjectOutputStream sReuniones = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream eReuniones = new ObjectInputStream(socket.getInputStream());
+
+			String[] datosReuniones = { "reuniones", Integer.toString(usuarioLogeado.getId()) };
+			sReuniones.writeObject(String.join(",", datosReuniones));
+
+			@SuppressWarnings("unchecked")
+			List<Reuniones> reuniones = (List<Reuniones>) eReuniones.readObject();
+
+			String matriz[][] = new String[reuniones.size()][8];
+
+			for (int i = 0; i < reuniones.size(); i++) {
+
+				matriz[i][0] = (reuniones.get(i).getFecha() != null) ? reuniones.get(i).getFecha().toString() : "NULL";
+
+				matriz[i][1] = (reuniones.get(i).getFecha() + " HORAS" != null) ? reuniones.get(i).getFecha().toString()
+						: "NULL";
+
+				matriz[i][2] = (Integer.toString(reuniones.get(i).getUsersByProfesorId().getId()) != null)
+						? Integer.toString(reuniones.get(i).getUsersByProfesorId().getId())
+						: "NULL";
+
+				matriz[i][3] = (reuniones.get(i).getIdReunion() != null) ? reuniones.get(i).getIdReunion().toString()
+						: "NULL";
+
+				matriz[i][4] = (reuniones.get(i).getIdCentro() != null) ? reuniones.get(i).getIdCentro() : "NULL";
+
+				matriz[i][5] = (reuniones.get(i).getTitulo() != null) ? reuniones.get(i).getTitulo() : "NULL";
+
+				matriz[i][6] = (reuniones.get(i).getAsunto() != null) ? reuniones.get(i).getAsunto() : "NULL";
+
+				matriz[i][7] = (reuniones.get(i).getAula() != null) ? reuniones.get(i).getAula() : "NULL";
+
+				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(matriz[i]);
+			}
+
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Metodo que recoge del Servidor una Lista de todos los usuarios
+	 */
 	@SuppressWarnings("unchecked")
 	private void mCargarTodosUsuarios() {
 		try {
@@ -166,33 +218,40 @@ public class Controlador implements ActionListener {
 
 	}
 
+	/**
+	 * * Metodo que envia el id del usuario para luego recibir del servidor una
+	 * Lista de los Otros Horarios y mostrarlos en una tabla.
+	 */
 	private void mCargarDatosOtrosHorarios() {
 		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
 				.getSelectedItem();
 		try {
 			ObjectOutputStream salidaDatosOtrosHorarios = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entradaResultadoOtrosHorarios = new ObjectInputStream(socket.getInputStream());
-			
-			String[] datosOtrosHorarios = { "otrosHorarios",Integer.toString(usuarioElegido.getId())};
+
+			String[] datosOtrosHorarios = { "otrosHorarios", Integer.toString(usuarioElegido.getId()) };
 			salidaDatosOtrosHorarios.writeObject(String.join(",", datosOtrosHorarios));
 
+			@SuppressWarnings("unchecked")
 			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
 
-			String matriz[][] = new String[otrosHorarios.size()][];
-			
-			//for (int i = 0; i < otrosHorarios.size(); i++) {
-				
-				//matriz[i][0] = (otrosHorarios.get(i).getId().getDia().toString() != null)? otrosHorarios.get(i).getId().getDia().toString(): "NULL";
-				
-				//matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null) ? otrosHorarios.get(i).getId().getHora().toString() : "NULL";
-				
-				//matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
-				
-				//matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
+			String matriz[][] = new String[otrosHorarios.size()][4];
 
-				//this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
+			for (int i = 0; i < otrosHorarios.size(); i++) {
 
-			//}
+				matriz[i][0] = (otrosHorarios.get(i).getId().getDia() != null) ? otrosHorarios.get(i).getId().getDia()
+						: "NULL";
+
+				matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null) ? otrosHorarios.get(i).getId().getHora()
+						: "NULL";
+
+				matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
+
+				matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
+
+				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
+
+			}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -204,6 +263,10 @@ public class Controlador implements ActionListener {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
 
+	/**
+	 * Metodo que envia al Servidor las credenciales del usuario cifradas
+	 * y el Servidor le devuelve el Objeto del Usuario entero.
+	 */
 	public void login() {
 		String user = vistaLogin.getTxtFUser().getText();
 		String pswd = new String(vistaLogin.getPswdFPassword().getPassword());
@@ -233,7 +296,7 @@ public class Controlador implements ActionListener {
 						JOptionPane.ERROR_MESSAGE);
 
 			} else {
-				JOptionPane.showMessageDialog(null, "Bienvenido", "Inicio de sesión exitoso",
+				JOptionPane.showMessageDialog(null, "Bienvenido "+usuarioLogeado.getNombre(), "Inicio de sesión exitoso",
 						JOptionPane.INFORMATION_MESSAGE);
 
 				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
@@ -250,12 +313,21 @@ public class Controlador implements ActionListener {
 		clearLogin();
 
 	}
-
+	
+	/**
+	 * Limpia los Texts Fields de login 
+	 */
 	public void clearLogin() {
 		vistaLogin.getTxtFUser().setText("");
 		vistaLogin.getPswdFPassword().setText("");
 	}
 
+	/**
+	 * Cifra el String que se le envia
+	 * @param respuesta String sin cifrar que recibe
+	 * @return Devuelve el string cifrado
+	 * @throws NoSuchAlgorithmException
+	 */
 	public static String hash(String respuesta) throws NoSuchAlgorithmException {
 		StringBuilder resumenString = new StringBuilder();
 		MessageDigest md = MessageDigest.getInstance("SHA");
@@ -272,6 +344,11 @@ public class Controlador implements ActionListener {
 		return resumenString.toString();
 	}
 
+	/**
+	 * Metodo que carga los horarios del usuario logeado
+	 * enviandole el id al servidor y le devuelve una Lista
+	 * de los Horarios del Usuario
+	 */
 	public void cargarHorarioProfe() {
 		if (panelHorario == null) {
 			panelHorario = new PanelHorario();
@@ -293,25 +370,40 @@ public class Controlador implements ActionListener {
 				return;
 			}
 
-			Object[][] data = new Object[horarios.size()][3];
+			Object[][] data = new Object[horarios.size()][6];
+			for (int h = 1; h <= 6; h++) {
+				data[h][0] = "Hora " + h;
+			}
 
 			for (int i = 0; i < horarios.size(); i++) {
 				Horarios horarioIndividual = horarios.get(i);
+				int hora = Integer.parseInt(horarioIndividual.getId().getHora());
 
-				System.out.println("Horarios recibidos: " + horarioIndividual);
-
-				data[i][0] = horarioIndividual.getId().getDia();
-				data[i][1] = horarioIndividual.getId().getHora();
-				data[i][2] = horarioIndividual.getModulos().getNombre();
+				switch (horarioIndividual.getId().getDia()) {
+				case "L/A":
+					data[hora][1] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "M/A":
+					data[hora][2] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "X":
+					data[hora][3] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "J/O":
+					data[hora][4] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "V/O":
+					data[hora][5] = horarioIndividual.getModulos().getNombre();
+					break;
+				default:
+					break;
+				}
 			}
 
-			panelHorario.actualizarTabla(data);
-
-			System.out.println("Datos a mostrar en la tabla:");
-			for (int i = 0; i < data.length; i++) {
-				System.out.println("Día: " + data[i][0] + ", Hora: " + data[i][1] + ", Módulo: " + data[i][2]);
+			// Agregar los datos a la vista
+			for (int h = 1; h <= 6; h++) {
+				this.vistaPrincipal.getPanelHorario().getModeloHorario().addRow(data[h]);
 			}
-
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
