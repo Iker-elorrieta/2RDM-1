@@ -189,8 +189,7 @@ public class Users implements java.io.Serializable {
 	}
 
 	public Users login(Session session) {
-		String hql = "FROM Users WHERE username='" + username + "' AND password='" + password + "' AND tipo_id!='" + 4
-				+ "'";
+		String hql = "FROM Users WHERE username='" + username + "' AND password='" + password + "'";
 		Query q = session.createQuery(hql);
 		return (Users) q.uniqueResult();
 

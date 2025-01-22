@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -125,6 +124,7 @@ public class Controlador implements ActionListener {
 			visualizarPanel(Principal.enumAcciones.PANEL_MENU);
 			break;
 		case PANEL_HORARIO:
+			this.vistaPrincipal.getPanelHorario().getModeloHorario().setRowCount(0);
 			visualizarPanel(Principal.enumAcciones.PANEL_HORARIO);
 			cargarHorarioProfe();
 			break;
@@ -172,27 +172,52 @@ public class Controlador implements ActionListener {
 		try {
 			ObjectOutputStream salidaDatosOtrosHorarios = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entradaResultadoOtrosHorarios = new ObjectInputStream(socket.getInputStream());
-			
-			String[] datosOtrosHorarios = { "otrosHorarios",Integer.toString(usuarioElegido.getId())};
+
+			String[] datosOtrosHorarios = { "otrosHorarios", Integer.toString(usuarioElegido.getId()) };
 			salidaDatosOtrosHorarios.writeObject(String.join(",", datosOtrosHorarios));
 
+			@SuppressWarnings("unchecked")
 			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
 
-			String matriz[][] = new String[otrosHorarios.size()][];
-			
-			//for (int i = 0; i < otrosHorarios.size(); i++) {
-				
-				//matriz[i][0] = (otrosHorarios.get(i).getId().getDia().toString() != null)? otrosHorarios.get(i).getId().getDia().toString(): "NULL";
-				
-				//matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null) ? otrosHorarios.get(i).getId().getHora().toString() : "NULL";
-				
-				//matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
-				
-				//matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
+			if (otrosHorarios == null || otrosHorarios.isEmpty()) {
+				System.out.println("No se han encontrado horarios.");
+				return;
+			}
 
-				//this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
+			Object[][] data = new Object[otrosHorarios.size()][6];
 
-			//}
+			for (int h = 1; h <= 6; h++) {
+				data[h][0] = "Hora " + h;
+			}
+
+			for (int i = 0; i < otrosHorarios.size(); i++) {
+				Horarios horarioIndividual = otrosHorarios.get(i);
+				int hora = Integer.parseInt(horarioIndividual.getId().getHora());
+
+				switch (horarioIndividual.getId().getDia()) {
+				case "L/A":
+					data[hora][1] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "M/A":
+					data[hora][2] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "X":
+					data[hora][3] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "J/O":
+					data[hora][4] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "V/O":
+					data[hora][5] = horarioIndividual.getModulos().getNombre();
+					break;
+				default:
+					break;
+				}
+			}
+
+			for (int h = 1; h <= 6; h++) {
+				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(data[h]);
+			}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();

@@ -30,7 +30,6 @@ public class Principal extends JFrame {
 		crearPanelOtrosHorarios();
 		crearPanelReuniones();
 
-		// Mostrar el panel de login al inicio.
 		visualizarPaneles(enumAcciones.PANEL_LOGIN);
 	}
 
