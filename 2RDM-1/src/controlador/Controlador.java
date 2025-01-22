@@ -271,6 +271,8 @@ public class Controlador implements ActionListener {
 				}
 			}
 
+			this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().setRowCount(0);
+
 			for (int h = 1; h <= 6; h++) {
 				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(data[h]);
 			}
