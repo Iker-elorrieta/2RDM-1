@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -199,6 +201,10 @@ public class Users implements java.io.Serializable {
 	public List<Users> todosUsers(Session session) {
 		String hql = "FROM Users";
 		Query q = session.createQuery(hql);
+
+		// Añadir este criterio para que no se repitan los usuarios en el combobox de
+		// otros horarios
+		q.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		List<Users> usuariosTodos = new ArrayList<Users>();
 		usuariosTodos = q.list();
 		return usuariosTodos;
