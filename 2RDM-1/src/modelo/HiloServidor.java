@@ -49,7 +49,6 @@ public class HiloServidor extends Thread {
 					}
 
 					salida.writeObject(usuario);
-
 				} else if (datosRecibidos[0].equals(horario)) {
 					
 					Horarios h = new Horarios();
