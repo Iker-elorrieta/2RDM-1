@@ -124,6 +124,7 @@ public class Controlador implements ActionListener {
 			visualizarPanel(Principal.enumAcciones.PANEL_MENU);
 			break;
 		case PANEL_HORARIO:
+			this.vistaPrincipal.getPanelHorario().getModeloHorario().setRowCount(0);
 			visualizarPanel(Principal.enumAcciones.PANEL_HORARIO);
 			cargarHorarioProfe();
 			break;
@@ -148,8 +149,8 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista de
-	 * las Reuniones y mostrarlos en una tabla.
+	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista
+	 * de las Reuniones y mostrarlos en una tabla.
 	 */
 	private void mCargarReuniones() {
 		try {
@@ -208,9 +209,11 @@ public class Controlador implements ActionListener {
 			salidaTodosUsuarios.writeObject(String.join(",", datosTodosUsuarios));
 			List<Users> usuarios = (List<Users>) entradaTodosUsuarios.readObject();
 
-			for (Users us : usuarios) {
-				this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
-			}
+			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0)
+				for (Users us : usuarios) {
+					if (us.getTipos().getId() != usuarioNoAdmitidoId)
+						this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
+				}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -219,8 +222,8 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * * Metodo que envia el id del usuario para luego recibir del servidor una
-	 * Lista de los Otros Horarios y mostrarlos en una tabla.
+	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista
+	 * de los Otros Horarios y mostrarlos en una tabla.
 	 */
 	private void mCargarDatosOtrosHorarios() {
 		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
@@ -235,22 +238,46 @@ public class Controlador implements ActionListener {
 			@SuppressWarnings("unchecked")
 			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
 
-			String matriz[][] = new String[otrosHorarios.size()][4];
+			if (otrosHorarios == null || otrosHorarios.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "No se han encontrado horarios para mostrar", "Aviso",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
+			Object[][] data = new Object[otrosHorarios.size()][6];
+			for (int h = 1; h <= 6; h++) {
+				data[h][0] = "Hora " + h;
+			}
 
 			for (int i = 0; i < otrosHorarios.size(); i++) {
+				Horarios horarioIndividual = otrosHorarios.get(i);
+				int hora = Integer.parseInt(horarioIndividual.getId().getHora());
 
-				matriz[i][0] = (otrosHorarios.get(i).getId().getDia() != null) ? otrosHorarios.get(i).getId().getDia()
-						: "NULL";
+				switch (horarioIndividual.getId().getDia()) {
+				case "L/A":
+					data[hora][1] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "M/A":
+					data[hora][2] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "X":
+					data[hora][3] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "J/O":
+					data[hora][4] = horarioIndividual.getModulos().getNombre();
+					break;
+				case "V/O":
+					data[hora][5] = horarioIndividual.getModulos().getNombre();
+					break;
+				default:
+					break;
+				}
+			}
 
-				matriz[i][1] = (otrosHorarios.get(i).getId().getHora() != null) ? otrosHorarios.get(i).getId().getHora()
-						: "NULL";
+			this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().setRowCount(0);
 
-				matriz[i][2] = (otrosHorarios.get(i).getUsers().getId() + "");
-
-				matriz[i][3] = (otrosHorarios.get(i).getModulos().getId() + "");
-
-				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(matriz[i]);
-
+			for (int h = 1; h <= 6; h++) {
+				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(data[h]);
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
@@ -264,8 +291,8 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que envia al Servidor las credenciales del usuario cifradas
-	 * y el Servidor le devuelve el Objeto del Usuario entero.
+	 * Metodo que envia al Servidor las credenciales del usuario cifradas y el
+	 * Servidor le devuelve el Objeto del Usuario entero.
 	 */
 	public void login() {
 		String user = vistaLogin.getTxtFUser().getText();
@@ -296,8 +323,8 @@ public class Controlador implements ActionListener {
 						JOptionPane.ERROR_MESSAGE);
 
 			} else {
-				JOptionPane.showMessageDialog(null, "Bienvenido "+usuarioLogeado.getNombre(), "Inicio de sesión exitoso",
-						JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Bienvenido " + usuarioLogeado.getNombre(),
+						"Inicio de sesión exitoso", JOptionPane.INFORMATION_MESSAGE);
 
 				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
 						Principal.enumAcciones.PANEL_MENU.toString());
@@ -313,9 +340,9 @@ public class Controlador implements ActionListener {
 		clearLogin();
 
 	}
-	
+
 	/**
-	 * Limpia los Texts Fields de login 
+	 * Limpia los Texts Fields de login
 	 */
 	public void clearLogin() {
 		vistaLogin.getTxtFUser().setText("");
@@ -324,6 +351,7 @@ public class Controlador implements ActionListener {
 
 	/**
 	 * Cifra el String que se le envia
+	 * 
 	 * @param respuesta String sin cifrar que recibe
 	 * @return Devuelve el string cifrado
 	 * @throws NoSuchAlgorithmException
@@ -345,9 +373,8 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que carga los horarios del usuario logeado
-	 * enviandole el id al servidor y le devuelve una Lista
-	 * de los Horarios del Usuario
+	 * Metodo que carga los horarios del usuario logeado enviandole el id al
+	 * servidor y le devuelve una Lista de los Horarios del Usuario
 	 */
 	public void cargarHorarioProfe() {
 		if (panelHorario == null) {
@@ -366,7 +393,8 @@ public class Controlador implements ActionListener {
 			List<Horarios> horarios = (List<Horarios>) entrada.readObject();
 
 			if (horarios == null || horarios.isEmpty()) {
-				System.out.println("No se han encontrado horarios.");
+				JOptionPane.showMessageDialog(null, "No se han encontrado horarios para mostrar", "Aviso",
+						JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
@@ -400,7 +428,6 @@ public class Controlador implements ActionListener {
 				}
 			}
 
-			// Agregar los datos a la vista
 			for (int h = 1; h <= 6; h++) {
 				this.vistaPrincipal.getPanelHorario().getModeloHorario().addRow(data[h]);
 			}

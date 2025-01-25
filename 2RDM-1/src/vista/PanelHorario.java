@@ -35,7 +35,8 @@ public class PanelHorario extends JPanel {
 
 		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 52, 841, 427);
+
+		scrollPane.setBounds(20, 52, 841, 425);
 		add(scrollPane);
 
 		modeloHorario = new DefaultTableModel(columnas, 0);
@@ -45,34 +46,23 @@ public class PanelHorario extends JPanel {
 		tablaHorario.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tablaHorario.setRowSelectionAllowed(false);
 		tablaHorario.setCellSelectionEnabled(false);
-		tablaHorario.setRowHeight(65); // Ajusta la altura de la fila
+		tablaHorario.setRowHeight(67);
+		tablaHorario.getColumnModel().getColumn(0).setMaxWidth(70);
 
 		tablaHorario.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 4045963045190976386L;
+
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 					boolean hasFocus, int row, int column) {
-				// Llama al renderizador por defecto
 				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
 						column);
 
-				// Configura el texto para que se ajuste a la celda
 				label.setText(value != null ? value.toString() : "");
 				label.setOpaque(true);
 				label.setHorizontalAlignment(JLabel.LEFT);
-				label.setVerticalAlignment(JLabel.TOP); // Alinea el texto arriba de la celda
-
-				// Habilita el salto de línea en el texto
+				label.setVerticalAlignment(JLabel.TOP);
 				label.setText("<html>" + label.getText().replace("\n", "<br>") + "</html>");
-
-				// Cambia los colores según el estado de selección
-				if (isSelected) {
-					label.setBackground(table.getSelectionBackground());
-					label.setForeground(table.getSelectionForeground());
-				} else {
-					label.setBackground(table.getBackground());
-					label.setForeground(table.getForeground());
-				}
-
 				return label;
 			}
 		});

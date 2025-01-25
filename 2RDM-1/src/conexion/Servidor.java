@@ -14,7 +14,7 @@ public class Servidor {
 		int puerto = 2000;
 		try (ServerSocket serverSocket = new ServerSocket(puerto)) {
 
-			System.out.println("Servidor esperando.......");
+			System.out.println("Servidor esperando...");
 			Socket socket = null;
 			while (disponible) {
 				socket = serverSocket.accept();
