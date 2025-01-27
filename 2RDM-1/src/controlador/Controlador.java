@@ -28,7 +28,8 @@ public class Controlador implements ActionListener {
 	private vista.PanelReuniones vistaReuniones;
 
 	private Socket socket = null;
-	private Users usuarioLogeado = null;
+	// private Users usuarioLogeado = null;
+	private int idUsuarioLogeado = 0;
 	private PanelHorario panelHorario;
 
 	private int usuarioNoAdmitidoId = 4;
@@ -175,7 +176,7 @@ public class Controlador implements ActionListener {
 		String pswd = new String(vistaLogin.getPswdFPassword().getPassword());
 
 		if (user.isEmpty() || pswd.isEmpty()) {
-			JOptionPane.showMessageDialog(null, loginRelleneCampos, error, JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, loginRelleneCampos, aviso, JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
@@ -188,16 +189,20 @@ public class Controlador implements ActionListener {
 
 			salidaDatosLogin.writeObject(String.join(",", datosLogin));
 
-			usuarioLogeado = (Users) entradaResultadoLogin.readObject();
+			String[] datosUsuario = null;
 
-			if (usuarioLogeado == null) {
+			datosUsuario = ((String) entradaResultadoLogin.readObject()).split(",");
+
+			if (datosUsuario == null) {
 				JOptionPane.showMessageDialog(null, loginIncorrecto, error, JOptionPane.ERROR_MESSAGE);
 
-			} else if (usuarioLogeado.getTipos().getId() == usuarioNoAdmitidoId) {
+			} else if (Integer.parseInt(datosUsuario[1]) == usuarioNoAdmitidoId) {
 				JOptionPane.showMessageDialog(null, loginExclusivoProfes, error, JOptionPane.ERROR_MESSAGE);
 
 			} else {
-				JOptionPane.showMessageDialog(null, loginBienvenida + usuarioLogeado.getNombre(), loginExitoso,
+				idUsuarioLogeado = Integer.parseInt(datosUsuario[0]);
+
+				JOptionPane.showMessageDialog(null, loginBienvenida + datosUsuario[2], loginExitoso,
 						JOptionPane.INFORMATION_MESSAGE);
 
 				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
@@ -254,7 +259,7 @@ public class Controlador implements ActionListener {
 		if (panelHorario == null)
 			panelHorario = new PanelHorario();
 
-		cargarTablaHorario(vista.Principal.enumAccionesHiloServidor.HORARIO.name(), usuarioLogeado.getId(),
+		cargarTablaHorario(vista.Principal.enumAccionesHiloServidor.HORARIO.name(), idUsuarioLogeado,
 				this.vistaPrincipal.getPanelHorario().getModeloHorario());
 
 	}
@@ -376,7 +381,7 @@ public class Controlador implements ActionListener {
 			ObjectInputStream eReuniones = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosReuniones = { vista.Principal.enumAccionesHiloServidor.REUNIONES.name(),
-					Integer.toString(usuarioLogeado.getId()) };
+					Integer.toString(idUsuarioLogeado) };
 			sReuniones.writeObject(String.join(",", datosReuniones));
 
 			@SuppressWarnings("unchecked")

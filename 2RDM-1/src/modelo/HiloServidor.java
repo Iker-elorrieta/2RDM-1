@@ -39,7 +39,6 @@ public class HiloServidor extends Thread {
 				switch (accion) {
 
 				case LOGIN:
-
 					Users usuario = new Users();
 					usuario.setUsername(datosRecibidos[1]);
 					usuario.setPassword(datosRecibidos[2]);
@@ -50,10 +49,16 @@ public class HiloServidor extends Thread {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
 						if (!resultadoGuardado.equals(""))
 							System.out.println(resultadoGuardado);
-
 					}
 
-					salida.writeObject(usuario);
+					if (usuario != null) {
+						String[] datosUsuario = { Integer.toString(usuario.getId()),
+								Integer.toString(usuario.getTipos().getId()), usuario.getNombre() };
+						salida.writeObject(String.join(",", datosUsuario));
+					} else {
+						String[] datosUsuario = { Integer.toString(-1), Integer.toString(-1) };
+						salida.writeObject(String.join(",", datosUsuario));
+					}
 
 					break;
 

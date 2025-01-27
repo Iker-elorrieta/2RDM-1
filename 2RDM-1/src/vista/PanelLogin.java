@@ -58,7 +58,7 @@ public class PanelLogin extends JPanel {
 		add(lblPswd);
 
 		lblImage = new JLabel();
-		lblImage.setBounds(251, 50, 381, 127);
+		lblImage.setBounds(224, 50, 435, 127);
 		File imageFile = new File("media/elorrieta-logo.png");
 
 		if (imageFile.exists()) {
