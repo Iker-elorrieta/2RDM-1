@@ -20,6 +20,7 @@ public class PanelLogin extends JPanel {
 	private JPasswordField pswdFPassword;
 
 	public PanelLogin() {
+		
 		setBackground(new Color(220, 220, 220));
 		setBounds(0, 0, 884, 561);
 		setLayout(null);

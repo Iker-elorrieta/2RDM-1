@@ -19,6 +19,7 @@ public class Ciclos implements java.io.Serializable {
 
 	public Ciclos() {
 	}
+	
 
 	public Ciclos(int id) {
 		this.id = id;

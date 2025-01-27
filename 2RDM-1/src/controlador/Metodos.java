@@ -38,13 +38,13 @@ public class Metodos {
 
 		} else if (datos.isJsonObject()) {
 
-			System.out.println("Objeto");
+			//TODO DESCOMENTAR PARA IMPRIMIRLO System.out.println("Objeto");
 			JsonObject objeto = datos.getAsJsonObject();
 			Iterator<Map.Entry<String, JsonElement>> iter2 = objeto.entrySet().iterator();
 			while (iter2.hasNext()) {
 				Map.Entry<String, JsonElement> ent = iter2.next();
 				JsonElement valor = ent.getValue();
-				System.out.println("Atributo: " + ent.getKey());
+				//TODO DESCOMENTAR PARA IMPRIMIRLO System.out.println("Atributo: " + ent.getKey());
 				parser(valor);
 			}
 
@@ -53,15 +53,15 @@ public class Metodos {
 			JsonPrimitive primi = datos.getAsJsonPrimitive();
 
 			if (primi.isString()) {
-				System.out.println("\tTexto: " + primi.getAsString());
+				//TODO DESCOMENTAR PARA IMPRIMIRLO System.out.println("\tTexto: " + primi.getAsString());
 			} else if (primi.isNumber()) {
-				System.out.println("\tNumero: " + primi.getAsNumber());
+				//TODO DESCOMENTAR PARA IMPRIMIRLO System.out.println("\tNumero: " + primi.getAsNumber());
 			} else if (primi.isBoolean()) {
-				System.out.println("\tTexto: " + primi.getAsBoolean());
+				//TODO DESCOMENTAR PARA IMPRIMIRLO System.out.println("\tBoolean: " + primi.getAsBoolean());
 			}
 
 		} else if (datos.isJsonNull()) {
-			System.out.println("Es nulo");
+			//TODO DESCOMENTAR PARA IMPRIMIRLO System.out.println("Es nulo");
 		}
 
 	}
