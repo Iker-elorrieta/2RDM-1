@@ -50,15 +50,21 @@ public class HiloServidor extends Thread {
 						if (!resultadoGuardado.equals(""))
 							System.out.println(resultadoGuardado);
 					}
-
-					if (usuario != null) {
-						String[] datosUsuario = { Integer.toString(usuario.getId()),
-								Integer.toString(usuario.getTipos().getId()), usuario.getNombre() };
-						salida.writeObject(String.join(",", datosUsuario));
-					} else {
-						String[] datosUsuario = { Integer.toString(-1), Integer.toString(-1) };
-						salida.writeObject(String.join(",", datosUsuario));
+					
+					if(usuario==null) {
+						usuario = new Users();
+						usuario.setId(-1);
+						usuario.setNombre(null);
+						Tipos tiposCero = new Tipos();
+						tiposCero.setId(-1);
+						usuario.setTipos(tiposCero);
 					}
+					
+					String[] datosUsuario = {Integer.toString(usuario.getId()),
+							Integer.toString(usuario.getTipos().getId()),
+							usuario.getNombre()};
+					
+					salida.writeObject(String.join(",", datosUsuario));
 
 					break;
 

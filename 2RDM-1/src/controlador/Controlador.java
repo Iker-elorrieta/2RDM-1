@@ -193,7 +193,7 @@ public class Controlador implements ActionListener {
 
 			datosUsuario = ((String) entradaResultadoLogin.readObject()).split(",");
 
-			if (datosUsuario == null) {
+			if (datosUsuario == null || datosUsuario[0].equals("-1")) {
 				JOptionPane.showMessageDialog(null, loginIncorrecto, error, JOptionPane.ERROR_MESSAGE);
 
 			} else if (Integer.parseInt(datosUsuario[1]) == usuarioNoAdmitidoId) {
