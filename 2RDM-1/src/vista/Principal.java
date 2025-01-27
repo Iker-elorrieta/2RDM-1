@@ -14,6 +14,10 @@ public class Principal extends JFrame {
 		CARGAR_TABLA_OTROS_HORARIOS
 	}
 
+	public static enum enumAccionesHiloServidor {
+		LOGIN, HORARIO, TODOSUSUARIOS, OTROSHORARIOS, REUNIONES;
+	}
+
 	private JPanel panelContenedor;
 	private PanelLogin panelLogin;
 	private PanelMenu panelMenu;
@@ -30,6 +34,7 @@ public class Principal extends JFrame {
 		crearPanelOtrosHorarios();
 		crearPanelReuniones();
 
+		// Mostrar el panel de login al inicio.
 		visualizarPaneles(enumAcciones.PANEL_LOGIN);
 	}
 

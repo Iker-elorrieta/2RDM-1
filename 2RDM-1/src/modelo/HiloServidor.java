@@ -11,15 +11,14 @@ import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import vista.Principal;
+
 public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
 
-	private final String login = "login", horario = "horario", todosUsuarios = "todosUsuarios",
-			otrosHorarios = "otrosHorarios", reuniones = "reuniones";
-
-	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
-	private static Session session = sesion.openSession();
+	private SessionFactory sesion = HibernateUtil.getSessionFactory();
+	private Session session = sesion.openSession();
 
 	public HiloServidor(Socket cliente) {
 		this.cliente = cliente;
@@ -36,7 +35,12 @@ public class HiloServidor extends Thread {
 				// Lee los datos del cliente
 				datosRecibidos = ((String) entrada.readObject()).split(",");
 
-				if (datosRecibidos[0].equals(login)) {
+				Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
+						.valueOf(datosRecibidos[0]);
+
+				switch (accion) {
+
+				case LOGIN:
 					Users usuario = new Users();
 					usuario.setUsername(datosRecibidos[1]);
 					usuario.setPassword(datosRecibidos[2]);
@@ -52,21 +56,24 @@ public class HiloServidor extends Thread {
 
 					salida.writeObject(usuario);
 
-				} else if (datosRecibidos[0].equals(horario)) {
+					break;
 
+				case HORARIO:
 					Horarios h = new Horarios();
-
 					List<Horarios> horarios = new ArrayList<>();
 					horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
 
 					salida.writeObject(horarios);
 
-				} else if (datosRecibidos[0].equals(todosUsuarios)) {
+					break;
 
+				case TODOSUSUARIOS:
 					Users usuariosTodos = new Users();
 					salida.writeObject(usuariosTodos.todosUsers(session));
 
-				} else if (datosRecibidos[0].equals(otrosHorarios)) {
+					break;
+
+				case OTROSHORARIOS:
 					Horarios otrosHorarios = new Horarios();
 					Users usElegido = new Users();
 
@@ -75,13 +82,17 @@ public class HiloServidor extends Thread {
 					salida.writeObject(
 							otrosHorarios.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session));
 
-				} else if (datosRecibidos[0].equals(reuniones)) {
+					break;
+				case REUNIONES:
 					Reuniones reu = new Reuniones();
 					Users uProfe = new Users();
 					uProfe.setId(Integer.parseInt(datosRecibidos[1]));
 					reu.setUsersByProfesorId(uProfe);
 
 					salida.writeObject(reu.reuniones(session));
+
+					break;
+
 				}
 
 				salida.flush();

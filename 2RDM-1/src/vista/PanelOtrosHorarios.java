@@ -111,5 +111,4 @@ public class PanelOtrosHorarios extends JPanel {
 	public void setProfesComboBox(JComboBox<Users> profesComboBox) {
 		this.profesComboBox = profesComboBox;
 	}
-
 }
