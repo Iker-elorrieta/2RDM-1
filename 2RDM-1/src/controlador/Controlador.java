@@ -15,7 +15,6 @@ import javax.swing.table.DefaultTableModel;
 import vista.PanelHorario;
 import vista.Principal;
 
-import modelo.Horarios;
 import modelo.Reuniones;
 import modelo.Users;
 
@@ -33,6 +32,15 @@ public class Controlador implements ActionListener {
 	private PanelHorario panelHorario;
 
 	private int usuarioNoAdmitidoId = 4;
+
+	private final static String error = "Error", aviso = "Aviso";
+	private final static String lunes = "L/A", martes = "M/A", miercoles = "X", jueves = "J/O", viernes = "V/O";
+	private final static String loginRelleneCampos = "Por favor, rellene todos los campos.",
+			loginIncorrecto = "Usuario o contraseña incorrectos",
+			loginExclusivoProfes = "El uso de la aplicación es exclusivo de profesores",
+			loginExitoso = "Inicio de sesión exitoso.", loginBienvenida = " Bienvenid@ ",
+			loginError = "Error al iniciar sesión", horarioNoEncontrado = "No se han encontrado horarios para mostrar",
+			horarioError = "Error al cargar el horario";
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
@@ -167,7 +175,7 @@ public class Controlador implements ActionListener {
 		String pswd = new String(vistaLogin.getPswdFPassword().getPassword());
 
 		if (user.isEmpty() || pswd.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "Rellene todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, loginRelleneCampos, error, JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -183,16 +191,14 @@ public class Controlador implements ActionListener {
 			usuarioLogeado = (Users) entradaResultadoLogin.readObject();
 
 			if (usuarioLogeado == null) {
-				JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, loginIncorrecto, error, JOptionPane.ERROR_MESSAGE);
 
 			} else if (usuarioLogeado.getTipos().getId() == usuarioNoAdmitidoId) {
-				JOptionPane.showMessageDialog(null, "El uso de la aplicación es exclusivo de profesores", "Error",
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, loginExclusivoProfes, error, JOptionPane.ERROR_MESSAGE);
 
 			} else {
-				JOptionPane.showMessageDialog(null, "Bienvenido " + usuarioLogeado.getNombre(),
-						"Inicio de sesión exitoso", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, loginBienvenida + usuarioLogeado.getNombre(), loginExitoso,
+						JOptionPane.INFORMATION_MESSAGE);
 
 				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
 						Principal.enumAcciones.PANEL_MENU.toString());
@@ -202,7 +208,7 @@ public class Controlador implements ActionListener {
 			}
 
 		} catch (IOException | NoSuchAlgorithmException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "Error al iniciar sesión", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, loginError, error, JOptionPane.ERROR_MESSAGE);
 		}
 
 		clearLogin();
@@ -266,49 +272,56 @@ public class Controlador implements ActionListener {
 
 	}
 
+	/**
+	 * Método que recibe los parámetros necesarios para crear la tabla de horarios
+	 * del usuario seleccionado. Funciona para los dos paneles de horarios (Horarios
+	 * y OtrosHorarios).
+	 * 
+	 * @param accion
+	 * @param userId
+	 * @param modelo
+	 */
+	@SuppressWarnings("unchecked")
 	private void cargarTablaHorario(String accion, int userId, DefaultTableModel modelo) {
-
 		try {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
-			String[] horario = { accion, userId + "" };
-
+			String[] horario = { accion, String.valueOf(userId) };
 			salida.writeObject(String.join(",", horario));
 
-			@SuppressWarnings("unchecked")
-			List<Horarios> horarios = (List<Horarios>) entrada.readObject();
+			List<Object[]> horarios = (List<Object[]>) entrada.readObject();
 
 			if (horarios == null || horarios.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "No se han encontrado horarios para mostrar", "Aviso",
-						JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, horarioNoEncontrado, aviso, JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 
-			Object[][] data = new Object[horarios.size()][6];
-			for (int h = 1; h <= 6; h++) {
-				data[h][0] = "Hora " + h;
+			Object[][] data = new Object[6][6];
+			for (int h = 0; h < 6; h++) {
+				data[h][0] = "Hora " + (h + 1);
 			}
 
-			for (int i = 0; i < horarios.size(); i++) {
-				Horarios h = horarios.get(i);
-				int hora = Integer.parseInt(h.getId().getHora());
+			for (Object[] horarioData : horarios) {
+				String dia = (String) horarioData[0];
+				int hora = Integer.parseInt((String) horarioData[1]) - 1;
+				String modulo = (String) horarioData[2];
 
-				switch (h.getId().getDia()) {
-				case "L/A":
-					data[hora][1] = h.getModulos().getNombre();
+				switch (dia) {
+				case lunes:
+					data[hora][1] = modulo;
 					break;
-				case "M/A":
-					data[hora][2] = h.getModulos().getNombre();
+				case martes:
+					data[hora][2] = modulo;
 					break;
-				case "X":
-					data[hora][3] = h.getModulos().getNombre();
+				case miercoles:
+					data[hora][3] = modulo;
 					break;
-				case "J/O":
-					data[hora][4] = h.getModulos().getNombre();
+				case jueves:
+					data[hora][4] = modulo;
 					break;
-				case "V/O":
-					data[hora][5] = h.getModulos().getNombre();
+				case viernes:
+					data[hora][5] = modulo;
 					break;
 				default:
 					break;
@@ -317,12 +330,12 @@ public class Controlador implements ActionListener {
 
 			modelo.setRowCount(0);
 
-			for (int h = 1; h <= 6; h++) {
-				modelo.addRow(data[h]);
+			for (Object[] row : data) {
+				modelo.addRow(row);
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, horarioError, error, JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	}
@@ -378,20 +391,13 @@ public class Controlador implements ActionListener {
 				matriz[i][1] = (reuniones.get(i).getFecha() + " HORAS" != null) ? reuniones.get(i).getFecha().toString()
 						: "NULL";
 
-				matriz[i][2] = (Integer.toString(reuniones.get(i).getUsersByProfesorId().getId()) != null)
-						? Integer.toString(reuniones.get(i).getUsersByProfesorId().getId())
-						: "NULL";
+				matriz[i][2] = (reuniones.get(i).getIdCentro() != null) ? reuniones.get(i).getIdCentro() : "NULL";
 
-				matriz[i][3] = (reuniones.get(i).getIdReunion() != null) ? reuniones.get(i).getIdReunion().toString()
-						: "NULL";
+				matriz[i][3] = (reuniones.get(i).getTitulo() != null) ? reuniones.get(i).getTitulo() : "NULL";
 
-				matriz[i][4] = (reuniones.get(i).getIdCentro() != null) ? reuniones.get(i).getIdCentro() : "NULL";
+				matriz[i][4] = (reuniones.get(i).getAsunto() != null) ? reuniones.get(i).getAsunto() : "NULL";
 
-				matriz[i][5] = (reuniones.get(i).getTitulo() != null) ? reuniones.get(i).getTitulo() : "NULL";
-
-				matriz[i][6] = (reuniones.get(i).getAsunto() != null) ? reuniones.get(i).getAsunto() : "NULL";
-
-				matriz[i][7] = (reuniones.get(i).getAula() != null) ? reuniones.get(i).getAula() : "NULL";
+				matriz[i][5] = (reuniones.get(i).getAula() != null) ? reuniones.get(i).getAula() : "NULL";
 
 				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(matriz[i]);
 			}

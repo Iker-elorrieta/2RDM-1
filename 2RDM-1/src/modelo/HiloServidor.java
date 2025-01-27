@@ -7,7 +7,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -50,8 +49,8 @@ public class HiloServidor extends Thread {
 					if (usuario != null && usuario.getTipos().getId() != 4) {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
 						if (!resultadoGuardado.equals(""))
-							JOptionPane.showMessageDialog(null, resultadoGuardado, "Información",
-									JOptionPane.INFORMATION_MESSAGE);
+							System.out.println(resultadoGuardado);
+
 					}
 
 					salida.writeObject(usuario);
@@ -63,8 +62,13 @@ public class HiloServidor extends Thread {
 					List<Horarios> horarios = new ArrayList<>();
 					horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
 
-					salida.writeObject(horarios);
+					List<Object[]> listaHorarios = new ArrayList<>();
+					for (Horarios horario : horarios) {
+						listaHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
+								horario.getModulos().getNombre() });
+					}
 
+					salida.writeObject(listaHorarios);
 					break;
 
 				case TODOSUSUARIOS:
@@ -74,15 +78,26 @@ public class HiloServidor extends Thread {
 					break;
 
 				case OTROSHORARIOS:
-					Horarios otrosHorarios = new Horarios();
-					Users usElegido = new Users();
+				    Horarios oH = new Horarios();
+				    Users usElegido = new Users();
 
-					usElegido.setId(Integer.parseInt(datosRecibidos[1]));
+				    usElegido.setId(Integer.parseInt(datosRecibidos[1]));
 
-					salida.writeObject(
-							otrosHorarios.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session));
+				    List<Horarios> otrosHorarios = oH.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
 
-					break;
+				    // Convertir Horarios a un arreglo antes de enviar
+				    List<Object[]> listaOtrosHorarios = new ArrayList<>();
+				    for (Horarios horario : otrosHorarios) {
+				        listaOtrosHorarios.add(new Object[]{
+				            horario.getId().getDia(),
+				            horario.getId().getHora(),
+				            horario.getModulos().getNombre()
+				        });
+				    }
+
+				    salida.writeObject(listaOtrosHorarios);
+				    break;
+
 				case REUNIONES:
 					Reuniones reu = new Reuniones();
 					Users uProfe = new Users();
