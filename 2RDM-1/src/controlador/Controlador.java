@@ -27,7 +27,8 @@ public class Controlador implements ActionListener {
 	private vista.PanelReuniones vistaReuniones;
 
 	private Socket socket = null;
-	private Users usuarioLogeado = null;
+	//private Users usuarioLogeado = null;
+	private int idUsuarioLogeado = 0;
 	private PanelHorario panelHorario;
 
 	private int usuarioNoAdmitidoId = 4;
@@ -175,21 +176,26 @@ public class Controlador implements ActionListener {
 			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosLogin = { vista.Principal.enumAccionesHiloServidor.LOGIN.name(), hash(user), hash(pswd) };
-
+			
 			salidaDatosLogin.writeObject(String.join(",", datosLogin));
 
-			usuarioLogeado = (Users) entradaResultadoLogin.readObject();
-
-			if (usuarioLogeado == null) {
+			String[] datosUsuario = null;
+			
+			datosUsuario = ((String) entradaResultadoLogin.readObject()).split(",");
+			
+			
+			if (datosUsuario == null) {
 				JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "Error",
 						JOptionPane.ERROR_MESSAGE);
 
-			} else if (usuarioLogeado.getTipos().getId() == usuarioNoAdmitidoId) {
+			} else if (Integer.parseInt(datosUsuario[1]) == usuarioNoAdmitidoId) {
 				JOptionPane.showMessageDialog(null, "El uso de la aplicación es exclusivo de profesores", "Error",
 						JOptionPane.ERROR_MESSAGE);
 
 			} else {
-				JOptionPane.showMessageDialog(null, "Bienvenido " + usuarioLogeado.getNombre(),
+				idUsuarioLogeado = Integer.parseInt(datosUsuario[0]);
+
+				JOptionPane.showMessageDialog(null, "Bienvenido " + datosUsuario[2],
 						"Inicio de sesión exitoso", JOptionPane.INFORMATION_MESSAGE);
 
 				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
@@ -198,6 +204,7 @@ public class Controlador implements ActionListener {
 				actionPerformed(e);
 
 			}
+			
 
 		} catch (IOException | NoSuchAlgorithmException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "Error al iniciar sesión", "Error", JOptionPane.ERROR_MESSAGE);
@@ -251,7 +258,7 @@ public class Controlador implements ActionListener {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
-			String[] horario = { vista.Principal.enumAccionesHiloServidor.HORARIO.name(), usuarioLogeado.getId() + "" };
+			String[] horario = { vista.Principal.enumAccionesHiloServidor.HORARIO.name(), Integer.toString(idUsuarioLogeado) };
 
 			salida.writeObject(String.join(",", horario));
 
@@ -405,7 +412,7 @@ public class Controlador implements ActionListener {
 			ObjectInputStream eReuniones = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosReuniones = { vista.Principal.enumAccionesHiloServidor.REUNIONES.name(),
-					Integer.toString(usuarioLogeado.getId()) };
+					Integer.toString(idUsuarioLogeado) };
 			sReuniones.writeObject(String.join(",", datosReuniones));
 
 			@SuppressWarnings("unchecked")

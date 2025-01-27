@@ -27,7 +27,7 @@ public class HiloServidor extends Thread {
 	@Override
 	public void run() {
 		try {
-
+			
 			while (cliente.isConnected()) {
 				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
@@ -53,8 +53,9 @@ public class HiloServidor extends Thread {
 							JOptionPane.showMessageDialog(null, resultadoGuardado, "Información",
 									JOptionPane.INFORMATION_MESSAGE);
 					}
-
-					salida.writeObject(usuario);
+					String[] datosUsuario = {Integer.toString(usuario.getId()),Integer.toString(usuario.getTipos().getId()),usuario.getNombre()};
+					
+					salida.writeObject(String.join(",", datosUsuario));
 
 					break;
 
