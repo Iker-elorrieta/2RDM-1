@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 import vista.PanelHorario;
 import vista.Principal;
@@ -19,6 +20,7 @@ import modelo.Reuniones;
 import modelo.Users;
 
 public class Controlador implements ActionListener {
+
 	private vista.Principal vistaPrincipal;
 	private vista.PanelLogin vistaLogin;
 	private vista.PanelMenu vistaMenu;
@@ -243,15 +245,34 @@ public class Controlador implements ActionListener {
 	 * servidor y le devuelve una Lista de los Horarios del Usuario
 	 */
 	public void cargarHorarioProfe() {
-		if (panelHorario == null) {
+		if (panelHorario == null)
 			panelHorario = new PanelHorario();
-		}
+
+		cargarTablaHorario(vista.Principal.enumAccionesHiloServidor.HORARIO.name(), usuarioLogeado.getId(),
+				this.vistaPrincipal.getPanelHorario().getModeloHorario());
+
+	}
+
+	/**
+	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista
+	 * de los Otros Horarios y mostrarlos en una tabla.
+	 */
+	private void mCargarDatosOtrosHorarios() {
+		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
+				.getSelectedItem();
+
+		cargarTablaHorario(vista.Principal.enumAccionesHiloServidor.OTROSHORARIOS.name(), usuarioElegido.getId(),
+				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios());
+
+	}
+
+	private void cargarTablaHorario(String accion, int userId, DefaultTableModel modelo) {
 
 		try {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
-			String[] horario = { vista.Principal.enumAccionesHiloServidor.HORARIO.name(), usuarioLogeado.getId() + "" };
+			String[] horario = { accion, userId + "" };
 
 			salida.writeObject(String.join(",", horario));
 
@@ -270,103 +291,40 @@ public class Controlador implements ActionListener {
 			}
 
 			for (int i = 0; i < horarios.size(); i++) {
-				Horarios horarioIndividual = horarios.get(i);
-				int hora = Integer.parseInt(horarioIndividual.getId().getHora());
+				Horarios h = horarios.get(i);
+				int hora = Integer.parseInt(h.getId().getHora());
 
-				switch (horarioIndividual.getId().getDia()) {
+				switch (h.getId().getDia()) {
 				case "L/A":
-					data[hora][1] = horarioIndividual.getModulos().getNombre();
+					data[hora][1] = h.getModulos().getNombre();
 					break;
 				case "M/A":
-					data[hora][2] = horarioIndividual.getModulos().getNombre();
+					data[hora][2] = h.getModulos().getNombre();
 					break;
 				case "X":
-					data[hora][3] = horarioIndividual.getModulos().getNombre();
+					data[hora][3] = h.getModulos().getNombre();
 					break;
 				case "J/O":
-					data[hora][4] = horarioIndividual.getModulos().getNombre();
+					data[hora][4] = h.getModulos().getNombre();
 					break;
 				case "V/O":
-					data[hora][5] = horarioIndividual.getModulos().getNombre();
+					data[hora][5] = h.getModulos().getNombre();
 					break;
 				default:
 					break;
 				}
 			}
 
+			modelo.setRowCount(0);
+
 			for (int h = 1; h <= 6; h++) {
-				this.vistaPrincipal.getPanelHorario().getModeloHorario().addRow(data[h]);
+				modelo.addRow(data[h]);
 			}
+
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "Error al cargar el horario", "Error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista
-	 * de los Otros Horarios y mostrarlos en una tabla.
-	 */
-	private void mCargarDatosOtrosHorarios() {
-		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
-				.getSelectedItem();
-		try {
-			ObjectOutputStream salidaDatosOtrosHorarios = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream entradaResultadoOtrosHorarios = new ObjectInputStream(socket.getInputStream());
-
-			String[] datosOtrosHorarios = { vista.Principal.enumAccionesHiloServidor.OTROSHORARIOS.name(),
-					Integer.toString(usuarioElegido.getId()) };
-			salidaDatosOtrosHorarios.writeObject(String.join(",", datosOtrosHorarios));
-
-			@SuppressWarnings("unchecked")
-			List<Horarios> otrosHorarios = (List<Horarios>) entradaResultadoOtrosHorarios.readObject();
-
-			if (otrosHorarios == null || otrosHorarios.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "No se han encontrado horarios para mostrar", "Aviso",
-						JOptionPane.WARNING_MESSAGE);
-				return;
-			}
-
-			Object[][] data = new Object[otrosHorarios.size()][6];
-			for (int h = 1; h <= 6; h++) {
-				data[h][0] = "Hora " + h;
-			}
-
-			for (int i = 0; i < otrosHorarios.size(); i++) {
-				Horarios horarioIndividual = otrosHorarios.get(i);
-				int hora = Integer.parseInt(horarioIndividual.getId().getHora());
-
-				switch (horarioIndividual.getId().getDia()) {
-				case "L/A":
-					data[hora][1] = horarioIndividual.getModulos().getNombre();
-					break;
-				case "M/A":
-					data[hora][2] = horarioIndividual.getModulos().getNombre();
-					break;
-				case "X":
-					data[hora][3] = horarioIndividual.getModulos().getNombre();
-					break;
-				case "J/O":
-					data[hora][4] = horarioIndividual.getModulos().getNombre();
-					break;
-				case "V/O":
-					data[hora][5] = horarioIndividual.getModulos().getNombre();
-					break;
-				default:
-					break;
-				}
-			}
-
-			this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().setRowCount(0);
-
-			for (int h = 1; h <= 6; h++) {
-				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().addRow(data[h]);
-			}
-
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	/**
