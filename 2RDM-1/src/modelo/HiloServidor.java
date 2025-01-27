@@ -39,6 +39,7 @@ public class HiloServidor extends Thread {
 				switch (accion) {
 
 				case LOGIN:
+
 					Users usuario = new Users();
 					usuario.setUsername(datosRecibidos[1]);
 					usuario.setPassword(datosRecibidos[2]);
@@ -65,6 +66,7 @@ public class HiloServidor extends Thread {
 					for (Horarios horario : horarios) {
 						listaHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
 								horario.getModulos().getNombre() });
+
 					}
 
 					salida.writeObject(listaHorarios);
@@ -77,25 +79,23 @@ public class HiloServidor extends Thread {
 					break;
 
 				case OTROSHORARIOS:
-				    Horarios oH = new Horarios();
-				    Users usElegido = new Users();
+					Horarios oH = new Horarios();
+					Users usElegido = new Users();
 
-				    usElegido.setId(Integer.parseInt(datosRecibidos[1]));
+					usElegido.setId(Integer.parseInt(datosRecibidos[1]));
 
-				    List<Horarios> otrosHorarios = oH.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
+					List<Horarios> otrosHorarios = oH.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]),
+							session);
 
-				    // Convertir Horarios a un arreglo antes de enviar
-				    List<Object[]> listaOtrosHorarios = new ArrayList<>();
-				    for (Horarios horario : otrosHorarios) {
-				        listaOtrosHorarios.add(new Object[]{
-				            horario.getId().getDia(),
-				            horario.getId().getHora(),
-				            horario.getModulos().getNombre()
-				        });
-				    }
+					// Convertir Horarios a un arreglo antes de enviar
+					List<Object[]> listaOtrosHorarios = new ArrayList<>();
+					for (Horarios horario : otrosHorarios) {
+						listaOtrosHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
+								horario.getModulos().getNombre() });
+					}
 
-				    salida.writeObject(listaOtrosHorarios);
-				    break;
+					salida.writeObject(listaOtrosHorarios);
+					break;
 
 				case REUNIONES:
 					Reuniones reu = new Reuniones();
