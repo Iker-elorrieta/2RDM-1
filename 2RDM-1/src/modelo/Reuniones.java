@@ -127,7 +127,7 @@ public class Reuniones implements java.io.Serializable {
 
 	@SuppressWarnings("unchecked")
 	public List<Reuniones> reuniones(Session session) {
-		String hql = "FROM Reuniones WHERE usersByProfesorId.id="+usersByProfesorId.getId();
+		String hql = "FROM Reuniones WHERE usersByProfesorId.id=" + usersByProfesorId.getId();
 		Query q = session.createQuery(hql);
 		List<Reuniones> reuniones = new ArrayList<Reuniones>();
 		reuniones = q.list();

@@ -9,14 +9,17 @@ import modelo.HiloServidor;
 
 public class Servidor {
 	public static void main(String[] args) {
-		boolean disponible = true;
 		Metodos metodos = new Metodos();
+		boolean disponible = true;
 		int puerto = 2000;
+
 		try (ServerSocket serverSocket = new ServerSocket(puerto)) {
 
 			System.out.println("Servidor esperando...");
 			Socket socket = null;
+
 			while (disponible) {
+
 				socket = serverSocket.accept();
 				System.out.println("Cliente conectado.");
 

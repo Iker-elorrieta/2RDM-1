@@ -10,7 +10,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 
-
 public class PanelReuniones extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JButton btnVolver;
@@ -21,14 +20,12 @@ public class PanelReuniones extends JPanel {
 		setBackground(new Color(220, 220, 220));
 		setBounds(0, 0, 884, 561);
 		setLayout(null);
-		
-		String columnas[] = { "Dia","Hora","Profe Id",
-				"Modulo Id","Id Centro", "Titulo","Asunto",
-				"Aula"};
+
+		String columnas[] = { "Dia", "Hora", "Id Centro", "Titulo", "Asunto", "Aula" };
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(230, 70, 572, 409);
 		add(scrollPane);
-		
+
 		modeloReuniones = new DefaultTableModel(columnas, 0);
 		tablaReuniones = new JTable(modeloReuniones);
 		tablaReuniones.setAutoCreateRowSorter(true);
@@ -38,9 +35,7 @@ public class PanelReuniones extends JPanel {
 
 		tablaReuniones.setDefaultEditor(Object.class, null);
 
-
 		scrollPane.setViewportView(tablaReuniones);
-	
 
 		btnVolver = new JButton("Volver");
 		btnVolver.setBounds(20, 505, 150, 35);
@@ -49,7 +44,7 @@ public class PanelReuniones extends JPanel {
 		btnVolver.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnVolver.setBackground(new Color(100, 100, 100));
 		add(btnVolver);
-		
+
 	}
 
 	public JButton getBtnVolver() {
@@ -71,5 +66,5 @@ public class PanelReuniones extends JPanel {
 	public void setTablaReuniones(JTable tablaReuniones) {
 		this.tablaReuniones = tablaReuniones;
 	}
-	
+
 }

@@ -42,7 +42,7 @@ public class Principal extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 900, 600);
 		panelContenedor = new JPanel();
-		panelContenedor.setBackground(new Color(141, 204, 235));
+		panelContenedor.setBackground(new Color(220, 220, 220));
 		panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(panelContenedor);
 		panelContenedor.setLayout(null);
