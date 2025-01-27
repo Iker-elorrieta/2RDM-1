@@ -15,6 +15,7 @@ import vista.Principal;
 public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
+	private final String login = "login", registro = "registro";
 
 	private SessionFactory sesion = HibernateUtil.getSessionFactory();
 	private Session session = sesion.openSession();
@@ -37,14 +38,17 @@ public class HiloServidor extends Thread {
 				Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
 						.valueOf(datosRecibidos[0]);
 
+
 				switch (accion) {
 
 				case LOGIN:
+
 					Users usuario = new Users();
 					usuario.setUsername(datosRecibidos[1]);
 					usuario.setPassword(datosRecibidos[2]);
 
 					usuario = usuario.login(session);
+
 
 					if (usuario != null && usuario.getTipos().getId() != 4) {
 						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
@@ -66,10 +70,19 @@ public class HiloServidor extends Thread {
 					for (Horarios horario : horarios) {
 						listaHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
 								horario.getModulos().getNombre() });
+
+					if (idUsuario != 0) {
+						Ciclos ciclo = new Ciclos();
+						String resultadoGuardado = ciclo.guardarCiclo(8, "ELECRONICA", session);
+						if (!resultadoGuardado.equals(""))
+							JOptionPane.showMessageDialog(null, resultadoGuardado, "Error",
+									JOptionPane.INFORMATION_MESSAGE);
+
 					}
 
 					salida.writeObject(listaHorarios);
 					break;
+
 
 				case TODOSUSUARIOS:
 					Users usuariosTodos = new Users();
@@ -107,6 +120,7 @@ public class HiloServidor extends Thread {
 					salida.writeObject(reu.reuniones(session));
 
 					break;
+
 
 				}
 
