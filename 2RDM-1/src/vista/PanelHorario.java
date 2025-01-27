@@ -17,12 +17,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class PanelHorario extends JPanel {
 
-	// ERRORES:
-	// - Cuando sales del horario y no te desconectas, no puedes volver a entrar en
-	// Otros Horarios.
-	// - Cuando inician sesión dos usuarios sin cerrar la app, se duplican sus
-	// horarios.
-
 	private static final long serialVersionUID = 1L;
 	private DefaultTableModel modeloHorario;
 	private JButton btnVolver;

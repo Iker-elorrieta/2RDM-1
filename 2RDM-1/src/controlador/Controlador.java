@@ -247,7 +247,7 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que carga los horarios del usuario logeado enviandole el id al
+	 * Método que carga los horarios del usuario logeado enviandole el id al
 	 * servidor y le devuelve una Lista de los Horarios del Usuario
 	 */
 	public void cargarHorarioProfe() {

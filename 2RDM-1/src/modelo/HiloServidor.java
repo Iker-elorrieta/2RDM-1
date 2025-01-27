@@ -31,7 +31,6 @@ public class HiloServidor extends Thread {
 				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
-				// Lee los datos del cliente
 				datosRecibidos = ((String) entrada.readObject()).split(",");
 
 				Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
