@@ -1,8 +1,12 @@
 package modelo;
 // Generated 14 ene 2025, 11:50:45 by Hibernate Tools 6.5.1.Final
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -11,6 +15,7 @@ import org.hibernate.Session;
  */
 public class Users implements java.io.Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private int id;
 	private Tipos tipos;
 	private String email;
@@ -185,16 +190,30 @@ public class Users implements java.io.Serializable {
 		this.horarioses = horarioses;
 	}
 
-	public int login(String user, String pswd, Session session) {
-		String hql = "FROM Users WHERE username='" + user + "' AND password='" + pswd + "' AND tipo_id!='" + 4 + "'";
+	public Users login(Session session) {
+		String hql = "FROM Users WHERE username='" + username + "' AND password='" + password + "'";
 		Query q = session.createQuery(hql);
-		Users usuario = (Users) q.uniqueResult();
-		if (usuario == null) {
-			return 0;
-		} else {
-			return usuario.getId();
+		return (Users) q.uniqueResult();
 
-		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Users> todosUsers(Session session) {
+		String hql = "FROM Users";
+		Query q = session.createQuery(hql);
+
+		// Añadir este criterio para que no se repitan los usuarios en el combobox de
+		// otros horarios
+		q.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		List<Users> usuariosTodos = new ArrayList<Users>();
+		usuariosTodos = q.list();
+		return usuariosTodos;
+
+	}
+
+	@Override
+	public String toString() {
+		return nombre;
 	}
 
 }

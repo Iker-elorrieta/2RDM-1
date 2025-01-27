@@ -19,6 +19,7 @@ public class Ciclos implements java.io.Serializable {
 
 	public Ciclos() {
 	}
+	
 
 	public Ciclos(int id) {
 		this.id = id;
@@ -63,7 +64,7 @@ public class Ciclos implements java.io.Serializable {
 		this.moduloses = moduloses;
 	}
 
-	public String guardarCiclo(int id, String nombre, Session session) {
+	public static String guardarCiclo(int id, String nombre, Session session) {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();

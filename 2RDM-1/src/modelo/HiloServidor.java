@@ -1,22 +1,24 @@
 package modelo;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+
+import vista.Principal;
 
 public class HiloServidor extends Thread {
 	private Socket cliente;
 	private String[] datosRecibidos;
-	private final String login = "login", registro = "registro";
 
-	private static SessionFactory sesion = HibernateUtil.getSessionFactory();
-	private static Session session = sesion.openSession();
+	private SessionFactory sesion = HibernateUtil.getSessionFactory();
+	private Session session = sesion.openSession();
 
 	public HiloServidor(Socket cliente) {
 		this.cliente = cliente;
@@ -26,34 +28,77 @@ public class HiloServidor extends Thread {
 	public void run() {
 		try {
 
-			while (true) {
-				DataInputStream entrada = new DataInputStream(cliente.getInputStream());
-				DataOutputStream salida = new DataOutputStream(cliente.getOutputStream());
+			while (cliente.isConnected()) {
+				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
+				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
 				// Lee los datos del cliente
-				datosRecibidos = entrada.readUTF().split(",");
+				datosRecibidos = ((String) entrada.readObject()).split(",");
 
-				if (datosRecibidos[0].equals(login)) {
+				Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
+						.valueOf(datosRecibidos[0]);
+
+				switch (accion) {
+
+				case LOGIN:
 					Users usuario = new Users();
-					int idUsuario = usuario.login(datosRecibidos[1], datosRecibidos[2], session);
+					usuario.setUsername(datosRecibidos[1]);
+					usuario.setPassword(datosRecibidos[2]);
 
-					if (idUsuario != 0) {
-						Ciclos ciclo = new Ciclos();
-						String resultadoGuardado = ciclo.guardarCiclo(8, "ELECRONICA", session);
+					usuario = usuario.login(session);
+
+					if (usuario != null && usuario.getTipos().getId() != 4) {
+						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
 						if (!resultadoGuardado.equals(""))
-							JOptionPane.showMessageDialog(null, resultadoGuardado, "Error",
+							JOptionPane.showMessageDialog(null, resultadoGuardado, "Información",
 									JOptionPane.INFORMATION_MESSAGE);
 					}
 
-					salida.writeInt(idUsuario);
-					salida.flush();
+					salida.writeObject(usuario);
 
-				} else if (datosRecibidos[0].equals(registro)) {
+					break;
+
+				case HORARIO:
+					Horarios h = new Horarios();
+					List<Horarios> horarios = new ArrayList<>();
+					horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
+
+					salida.writeObject(horarios);
+
+					break;
+
+				case TODOSUSUARIOS:
+					Users usuariosTodos = new Users();
+					salida.writeObject(usuariosTodos.todosUsers(session));
+
+					break;
+
+				case OTROSHORARIOS:
+					Horarios otrosHorarios = new Horarios();
+					Users usElegido = new Users();
+
+					usElegido.setId(Integer.parseInt(datosRecibidos[1]));
+
+					salida.writeObject(
+							otrosHorarios.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session));
+
+					break;
+				case REUNIONES:
+					Reuniones reu = new Reuniones();
+					Users uProfe = new Users();
+					uProfe.setId(Integer.parseInt(datosRecibidos[1]));
+					reu.setUsersByProfesorId(uProfe);
+
+					salida.writeObject(reu.reuniones(session));
+
+					break;
 
 				}
+
+				salida.flush();
 			}
 
-		} catch (IOException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
