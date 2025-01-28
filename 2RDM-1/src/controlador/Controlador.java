@@ -402,19 +402,53 @@ public class Controlador implements ActionListener {
 
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
+				System.out.println(localDate.plusDays(7));
+
 				String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
 
 				System.out.println(dia);
 
-				data[i][2] = reuniones.get(i).getTitulo();
+				switch (dia) {
 
-				data[i][2] += "\n Asunto: " + reuniones.get(i).getAsunto();
+				case "lunes":
 
-				data[i][2] += "\n Centro: " + reuniones.get(i).getIdCentro();
+					data[i][1] = reuniones.get(i).getTitulo();
+					data[i][1] += "\n Asunto: " + reuniones.get(i).getAsunto();
+					data[i][1] += "\n Centro: " + reuniones.get(i).getIdCentro();
+					data[i][1] += "\n Aula: " + reuniones.get(i).getAula();
 
-				data[i][2] += "\n Aula: " + reuniones.get(i).getAula();
+					break;
+				case "martes":
+					data[i][2] = reuniones.get(i).getTitulo();
+					data[i][2] += "\n Asunto: " + reuniones.get(i).getAsunto();
+					data[i][2] += "\n Centro: " + reuniones.get(i).getIdCentro();
+					data[i][2] += "\n Aula: " + reuniones.get(i).getAula();
+					break;
+				case "miercoles":
+					data[i][3] = reuniones.get(i).getTitulo();
+					data[i][3] += "\n Asunto: " + reuniones.get(i).getAsunto();
+					data[i][3] += "\n Centro: " + reuniones.get(i).getIdCentro();
+					data[i][3] += "\n Aula: " + reuniones.get(i).getAula();
+					break;
+				case "jueves":
+					data[i][4] = reuniones.get(i).getTitulo();
+					data[i][4] += "\n Asunto: " + reuniones.get(i).getAsunto();
+					data[i][4] += "\n Centro: " + reuniones.get(i).getIdCentro();
+					data[i][4] += "\n Aula: " + reuniones.get(i).getAula();
+					break;
+				case "viernes":
+					data[i][5] = reuniones.get(i).getTitulo();
+					data[i][5] += "\n Asunto: " + reuniones.get(i).getAsunto();
+					data[i][5] += "\n Centro: " + reuniones.get(i).getIdCentro();
+					data[i][5] += "\n Aula: " + reuniones.get(i).getAula();
+					break;
+				default:
+					break;
+
+				}
 
 				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(data[i]);
+
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
