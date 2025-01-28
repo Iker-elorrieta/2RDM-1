@@ -66,6 +66,7 @@ public class HiloServidor extends Thread {
 	}
 
 	private void login(ObjectOutputStream salida) throws IOException {
+
 		Users usuario = new Users();
 		usuario.setUsername(datosRecibidos[1]);
 		usuario.setPassword(datosRecibidos[2]);
@@ -87,6 +88,8 @@ public class HiloServidor extends Thread {
 			usuario.setDireccion(null);
 			usuario.setTelefono1(-1);
 			usuario.setTelefono2(-1);
+			usuario.setApellidos(null);
+			usuario.setUsername(null);
 
 			Tipos tiposCero = new Tipos();
 			tiposCero.setId(-1);
@@ -104,6 +107,10 @@ public class HiloServidor extends Thread {
 				usuario.getDireccion(), // [5] --> Direcc
 				usuario.getTelefono1() != null ? Integer.toString(usuario.getTelefono1()) : "0", // [6] --> Tlf1
 				usuario.getTelefono2() != null ? Integer.toString(usuario.getTelefono2()) : "0", // [7] --> Tlf2
+				usuario.getApellidos(), // [8] --> apellido
+				usuario.getUsername() // [9] --> username
+
+				// TODO falta usuario.getArgazkia(URL);
 
 		};
 
