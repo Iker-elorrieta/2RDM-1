@@ -181,7 +181,6 @@ public class Controlador implements ActionListener {
 		}
 
 		try {
-
 			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
 
@@ -217,7 +216,6 @@ public class Controlador implements ActionListener {
 		}
 
 		clearLogin();
-
 	}
 
 	/**
