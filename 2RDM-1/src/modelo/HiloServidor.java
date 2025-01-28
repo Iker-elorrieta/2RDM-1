@@ -85,14 +85,31 @@ public class HiloServidor extends Thread {
 		if (usuario == null) {
 			usuario = new Users();
 			usuario.setId(-1);
+			usuario.setEmail(null);
 			usuario.setNombre(null);
+			usuario.setDni(null);
+			usuario.setDireccion(null);
+			usuario.setTelefono1(-1);
+			usuario.setTelefono2(-1);
+
 			Tipos tiposCero = new Tipos();
 			tiposCero.setId(-1);
 			usuario.setTipos(tiposCero);
+
+			// TODO falta usuario.setArgazkia(null);
+
 		}
 
-		String[] datosUsuario = { Integer.toString(usuario.getId()), Integer.toString(usuario.getTipos().getId()),
-				usuario.getNombre() };
+		String[] datosUsuario = { Integer.toString(usuario.getId()), // [0] --> ID
+				Integer.toString(usuario.getTipos().getId()), // [1] --> ID
+				usuario.getNombre(), // [2] --> ID
+				usuario.getEmail(), // [3] --> email
+				usuario.getDni(), // [4] --> DNI
+				usuario.getDireccion(), // [5] --> Direcc
+				usuario.getTelefono1() != null ? Integer.toString(usuario.getTelefono1()) : "0", // [6] --> Tlf1
+				usuario.getTelefono2() != null ? Integer.toString(usuario.getTelefono2()) : "0", // [7] --> Tlf2
+
+		};
 
 		salida.writeObject(String.join(",", datosUsuario));
 
