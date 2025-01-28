@@ -259,8 +259,7 @@ public class Controlador implements ActionListener {
 		if (panelHorario == null)
 			panelHorario = new PanelHorario();
 
-		cargarTablaHorario(vista.Principal.enumAccionesHiloServidor.HORARIO.name(), idUsuarioLogeado,
-				this.vistaPrincipal.getPanelHorario().getModeloHorario());
+		cargarTablaHorario(idUsuarioLogeado, this.vistaPrincipal.getPanelHorario().getModeloHorario());
 
 	}
 
@@ -272,7 +271,7 @@ public class Controlador implements ActionListener {
 		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
 				.getSelectedItem();
 
-		cargarTablaHorario(vista.Principal.enumAccionesHiloServidor.OTROSHORARIOS.name(), usuarioElegido.getId(),
+		cargarTablaHorario(usuarioElegido.getId(),
 				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios());
 
 	}
@@ -287,12 +286,12 @@ public class Controlador implements ActionListener {
 	 * @param modelo
 	 */
 	@SuppressWarnings("unchecked")
-	private void cargarTablaHorario(String accion, int userId, DefaultTableModel modelo) {
+	private void cargarTablaHorario(int userId, DefaultTableModel modelo) {
 		try {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
-			String[] horario = { accion, String.valueOf(userId) };
+			String[] horario = { vista.Principal.enumAccionesHiloServidor.HORARIO.name(), String.valueOf(userId) };
 			salida.writeObject(String.join(",", horario));
 
 			List<Object[]> horarios = (List<Object[]>) entrada.readObject();

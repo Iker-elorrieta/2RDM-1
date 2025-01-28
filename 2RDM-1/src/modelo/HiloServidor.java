@@ -50,10 +50,6 @@ public class HiloServidor extends Thread {
 					todosUsuarios(salida);
 					break;
 
-				case OTROSHORARIOS:
-					otrosHorarios(salida);
-					break;
-
 				case REUNIONES:
 					reuniones(salida);
 					break;
@@ -134,25 +130,6 @@ public class HiloServidor extends Thread {
 	private void todosUsuarios(ObjectOutputStream salida) throws IOException {
 		Users usuariosTodos = new Users();
 		salida.writeObject(usuariosTodos.todosUsers(session));
-
-	}
-
-	private void otrosHorarios(ObjectOutputStream salida) throws IOException {
-		Horarios oH = new Horarios();
-		Users usElegido = new Users();
-
-		usElegido.setId(Integer.parseInt(datosRecibidos[1]));
-
-		List<Horarios> otrosHorarios = oH.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
-
-		// Convertir Horarios a un arreglo antes de enviar
-		List<Object[]> listaOtrosHorarios = new ArrayList<>();
-		for (Horarios horario : otrosHorarios) {
-			listaOtrosHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
-					horario.getModulos().getNombre() });
-		}
-
-		salida.writeObject(listaOtrosHorarios);
 
 	}
 
