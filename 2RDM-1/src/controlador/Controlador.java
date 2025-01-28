@@ -8,7 +8,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
+
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -386,29 +391,56 @@ public class Controlador implements ActionListener {
 			@SuppressWarnings("unchecked")
 			List<Reuniones> reuniones = (List<Reuniones>) eReuniones.readObject();
 
-			String matriz[][] = new String[reuniones.size()][8];
+			String data[][] = new String[6][6];
+			for (int h = 0; h < 6; h++) {
+				data[h][0] = "Hora " + (h + 1);
+			}
 
 			for (int i = 0; i < reuniones.size(); i++) {
 
-				matriz[i][0] = (reuniones.get(i).getFecha() != null) ? reuniones.get(i).getFecha().toString() : "NULL";
+				int[] fecha = formatearFecha(reuniones.get(i).getFecha());
 
-				matriz[i][1] = (reuniones.get(i).getFecha() + " HORAS" != null) ? reuniones.get(i).getFecha().toString()
-						: "NULL";
+				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
-				matriz[i][2] = (reuniones.get(i).getIdCentro() != null) ? reuniones.get(i).getIdCentro() : "NULL";
+				String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
 
-				matriz[i][3] = (reuniones.get(i).getTitulo() != null) ? reuniones.get(i).getTitulo() : "NULL";
+				System.out.println(dia);
 
-				matriz[i][4] = (reuniones.get(i).getAsunto() != null) ? reuniones.get(i).getAsunto() : "NULL";
+				data[i][2] = reuniones.get(i).getTitulo();
 
-				matriz[i][5] = (reuniones.get(i).getAula() != null) ? reuniones.get(i).getAula() : "NULL";
+				data[i][2] += "\n Asunto: " + reuniones.get(i).getAsunto();
 
-				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(matriz[i]);
+				data[i][2] += "\n Centro: " + reuniones.get(i).getIdCentro();
+
+				data[i][2] += "\n Aula: " + reuniones.get(i).getAula();
+
+				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(data[i]);
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private int[] formatearFecha(Timestamp fecha) {
+
+		String[] partesFechaHora = fecha.toString().split(" ");
+
+		String soloFecha = partesFechaHora[0];
+		String soloHora = partesFechaHora[1];
+
+		String[] date = soloFecha.split("-");
+		String[] time = soloHora.split(":");
+
+		int[] resultado = new int[6];
+		resultado[0] = Integer.parseInt(date[0]); // Año
+		resultado[1] = Integer.parseInt(date[1]); // Mes
+		resultado[2] = Integer.parseInt(date[2]); // Día
+		resultado[3] = Integer.parseInt(time[0]); // Hora
+		resultado[4] = Integer.parseInt(time[1]); // Minutos
+		resultado[5] = Integer.parseInt(time[2].split("\\.")[0]); // Segundos (eliminar ".0")
+
+		return resultado;
 	}
 
 }

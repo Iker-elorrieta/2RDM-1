@@ -141,12 +141,12 @@ public class HiloServidor extends Thread {
 	}
 
 	private void reuniones(ObjectOutputStream salida) throws IOException {
-		Reuniones reu = new Reuniones();
-		Users uProfe = new Users();
-		uProfe.setId(Integer.parseInt(datosRecibidos[1]));
-		reu.setUsersByProfesorId(uProfe);
+		Reuniones r = new Reuniones();
+		Users u = new Users();
+		u.setId(Integer.parseInt(datosRecibidos[1]));
+		r.setUsersByProfesorId(u);
 
-		salida.writeObject(reu.reuniones(session));
+		salida.writeObject(r.reuniones(session));
 
 	}
 

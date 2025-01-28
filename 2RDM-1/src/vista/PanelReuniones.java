@@ -1,13 +1,16 @@
 package vista;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class PanelReuniones extends JPanel {
@@ -21,17 +24,39 @@ public class PanelReuniones extends JPanel {
 		setBounds(0, 0, 884, 561);
 		setLayout(null);
 
-		String columnas[] = { "Dia", "Hora", "Id Centro", "Titulo", "Asunto", "Aula" };
+		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(230, 70, 572, 409);
+		scrollPane.setBounds(20, 70, 842, 425);
 		add(scrollPane);
 
 		modeloReuniones = new DefaultTableModel(columnas, 0);
 		tablaReuniones = new JTable(modeloReuniones);
+		tablaReuniones.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		tablaReuniones.setAutoCreateRowSorter(true);
 		tablaReuniones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tablaReuniones.setRowSelectionAllowed(false);
 		tablaReuniones.setCellSelectionEnabled(false);
+		tablaReuniones.setRowHeight(67);
+		tablaReuniones.getColumnModel().getColumn(0).setMaxWidth(70);
+
+		tablaReuniones.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = -2911240376199387811L;
+
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+						column);
+
+				label.setText(value != null ? value.toString() : "");
+				label.setOpaque(true);
+				label.setHorizontalAlignment(JLabel.LEFT);
+				label.setVerticalAlignment(JLabel.TOP);
+				label.setText("<html>" + label.getText().replace("\n", "<br>") + "</html>");
+
+				return label;
+			}
+		});
 
 		tablaReuniones.setDefaultEditor(Object.class, null);
 
