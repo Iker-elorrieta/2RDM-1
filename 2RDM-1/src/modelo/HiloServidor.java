@@ -39,83 +39,23 @@ public class HiloServidor extends Thread {
 				switch (accion) {
 
 				case LOGIN:
-					Users usuario = new Users();
-					usuario.setUsername(datosRecibidos[1]);
-					usuario.setPassword(datosRecibidos[2]);
-
-					usuario = usuario.login(session);
-
-					if (usuario != null && usuario.getTipos().getId() != 4) {
-						String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
-						if (!resultadoGuardado.equals(""))
-							System.out.println(resultadoGuardado);
-					}
-					
-					if(usuario==null) {
-						usuario = new Users();
-						usuario.setId(-1);
-						usuario.setNombre(null);
-						Tipos tiposCero = new Tipos();
-						tiposCero.setId(-1);
-						usuario.setTipos(tiposCero);
-					}
-					
-					String[] datosUsuario = {Integer.toString(usuario.getId()),
-							Integer.toString(usuario.getTipos().getId()),
-							usuario.getNombre()};
-					
-					salida.writeObject(String.join(",", datosUsuario));
-
+					login(salida);
 					break;
 
 				case HORARIO:
-					Horarios h = new Horarios();
-					List<Horarios> horarios = new ArrayList<>();
-					horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
-
-					List<Object[]> listaHorarios = new ArrayList<>();
-					for (Horarios horario : horarios) {
-						listaHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
-								horario.getModulos().getNombre() });
-
-					}
-
-					salida.writeObject(listaHorarios);
+					horario(salida);
 					break;
 
 				case TODOSUSUARIOS:
-					Users usuariosTodos = new Users();
-					salida.writeObject(usuariosTodos.todosUsers(session));
-
+					todosUsuarios(salida);
 					break;
 
 				case OTROSHORARIOS:
-					Horarios oH = new Horarios();
-					Users usElegido = new Users();
-
-					usElegido.setId(Integer.parseInt(datosRecibidos[1]));
-
-					List<Horarios> otrosHorarios = oH.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]),
-							session);
-
-					// Convertir Horarios a un arreglo antes de enviar
-					List<Object[]> listaOtrosHorarios = new ArrayList<>();
-					for (Horarios horario : otrosHorarios) {
-						listaOtrosHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
-								horario.getModulos().getNombre() });
-					}
-
-					salida.writeObject(listaOtrosHorarios);
+					otrosHorarios(salida);
 					break;
 
 				case REUNIONES:
-					Reuniones reu = new Reuniones();
-					Users uProfe = new Users();
-					uProfe.setId(Integer.parseInt(datosRecibidos[1]));
-					reu.setUsersByProfesorId(uProfe);
-
-					salida.writeObject(reu.reuniones(session));
-
+					reuniones(salida);
 					break;
 
 				}
@@ -126,6 +66,86 @@ public class HiloServidor extends Thread {
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+
+	}
+
+	private void login(ObjectOutputStream salida) throws IOException {
+		Users usuario = new Users();
+		usuario.setUsername(datosRecibidos[1]);
+		usuario.setPassword(datosRecibidos[2]);
+
+		usuario = usuario.login(session);
+
+		if (usuario != null && usuario.getTipos().getId() != 4) {
+			String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
+			if (!resultadoGuardado.equals(""))
+				System.out.println(resultadoGuardado);
+		}
+
+		if (usuario == null) {
+			usuario = new Users();
+			usuario.setId(-1);
+			usuario.setNombre(null);
+			Tipos tiposCero = new Tipos();
+			tiposCero.setId(-1);
+			usuario.setTipos(tiposCero);
+		}
+
+		String[] datosUsuario = { Integer.toString(usuario.getId()), Integer.toString(usuario.getTipos().getId()),
+				usuario.getNombre() };
+
+		salida.writeObject(String.join(",", datosUsuario));
+
+	}
+
+	private void horario(ObjectOutputStream salida) throws IOException {
+		Horarios h = new Horarios();
+		List<Horarios> horarios = new ArrayList<>();
+		horarios = h.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
+
+		List<Object[]> listaHorarios = new ArrayList<>();
+		for (Horarios horario : horarios) {
+			listaHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
+					horario.getModulos().getNombre() });
+
+		}
+
+		salida.writeObject(listaHorarios);
+
+	}
+
+	private void todosUsuarios(ObjectOutputStream salida) throws IOException {
+		Users usuariosTodos = new Users();
+		salida.writeObject(usuariosTodos.todosUsers(session));
+
+	}
+
+	private void otrosHorarios(ObjectOutputStream salida) throws IOException {
+		Horarios oH = new Horarios();
+		Users usElegido = new Users();
+
+		usElegido.setId(Integer.parseInt(datosRecibidos[1]));
+
+		List<Horarios> otrosHorarios = oH.cargarHorariosPorUsuario(Integer.parseInt(datosRecibidos[1]), session);
+
+		// Convertir Horarios a un arreglo antes de enviar
+		List<Object[]> listaOtrosHorarios = new ArrayList<>();
+		for (Horarios horario : otrosHorarios) {
+			listaOtrosHorarios.add(new Object[] { horario.getId().getDia(), horario.getId().getHora(),
+					horario.getModulos().getNombre() });
+		}
+
+		salida.writeObject(listaOtrosHorarios);
+
+	}
+
+	private void reuniones(ObjectOutputStream salida) throws IOException {
+		Reuniones reu = new Reuniones();
+		Users uProfe = new Users();
+		uProfe.setId(Integer.parseInt(datosRecibidos[1]));
+		reu.setUsersByProfesorId(uProfe);
+
+		salida.writeObject(reu.reuniones(session));
 
 	}
 

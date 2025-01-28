@@ -28,7 +28,6 @@ public class Controlador implements ActionListener {
 	private vista.PanelReuniones vistaReuniones;
 
 	private Socket socket = null;
-	// private Users usuarioLogeado = null;
 	private int idUsuarioLogeado = 0;
 	private PanelHorario panelHorario;
 
@@ -182,24 +181,27 @@ public class Controlador implements ActionListener {
 
 		try {
 
-			ObjectOutputStream salidaDatosLogin = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream entradaResultadoLogin = new ObjectInputStream(socket.getInputStream());
+			ObjectOutputStream salidaLogin = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entradaLogin = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosLogin = { vista.Principal.enumAccionesHiloServidor.LOGIN.name(), hash(user), hash(pswd) };
 
-			salidaDatosLogin.writeObject(String.join(",", datosLogin));
+			salidaLogin.writeObject(String.join(",", datosLogin));
 
 			String[] datosUsuario = null;
 
-			datosUsuario = ((String) entradaResultadoLogin.readObject()).split(",");
+			datosUsuario = ((String) entradaLogin.readObject()).split(",");
 
 			if (datosUsuario == null || datosUsuario[0].equals("-1")) {
+				// Login incorrecto
 				JOptionPane.showMessageDialog(null, loginIncorrecto, error, JOptionPane.ERROR_MESSAGE);
 
 			} else if (Integer.parseInt(datosUsuario[1]) == usuarioNoAdmitidoId) {
+				// Login correcto - Tipo usuario NO admitido
 				JOptionPane.showMessageDialog(null, loginExclusivoProfes, error, JOptionPane.ERROR_MESSAGE);
 
 			} else {
+				// Login correcto - Tipo usuario admitido
 				idUsuarioLogeado = Integer.parseInt(datosUsuario[0]);
 
 				JOptionPane.showMessageDialog(null, loginBienvenida + datosUsuario[2], loginExitoso,
@@ -351,13 +353,13 @@ public class Controlador implements ActionListener {
 	@SuppressWarnings("unchecked")
 	private void mCargarTodosUsuarios() {
 		try {
-			ObjectOutputStream salidaTodosUsuarios = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream entradaTodosUsuarios = new ObjectInputStream(socket.getInputStream());
+			ObjectOutputStream salidaUsuarios = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entradaUsuarios = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosTodosUsuarios = { vista.Principal.enumAccionesHiloServidor.TODOSUSUARIOS.name() };
 
-			salidaTodosUsuarios.writeObject(String.join(",", datosTodosUsuarios));
-			List<Users> usuarios = (List<Users>) entradaTodosUsuarios.readObject();
+			salidaUsuarios.writeObject(String.join(",", datosTodosUsuarios));
+			List<Users> usuarios = (List<Users>) entradaUsuarios.readObject();
 
 			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0)
 				for (Users us : usuarios) {
