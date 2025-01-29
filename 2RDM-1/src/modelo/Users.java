@@ -198,17 +198,36 @@ public class Users implements java.io.Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Users> todosUsers(Session session) {
-		String hql = "FROM Users";
-		Query q = session.createQuery(hql);
+	public List<String> todosUsers(Session session) {
+	    String hql = "FROM Users";
+	    Query q = session.createQuery(hql);
+	    List<String> usuariosTodosString = new ArrayList<String>();
 
-		// Añadir este criterio para que no se repitan los usuarios en el combobox de
-		// otros horarios
-		q.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		List<Users> usuariosTodos = new ArrayList<Users>();
-		usuariosTodos = q.list();
-		return usuariosTodos;
+	    // Añadir este criterio para que no se repitan los usuarios en el combobox de
+	    // otros horarios
+	    q.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+	    List<Users> usuariosTodos = q.list();
+	    
+	    for (Users usuario : usuariosTodos) {
 
+	    	String usuarioString = String.join(", ",
+	            String.valueOf(usuario.getId()),
+	            usuario.getTipos() != null ? usuario.getTipos().toString() : "null",
+	            usuario.getEmail(),
+	            usuario.getUsername(),
+	            usuario.getPassword(),
+	            usuario.getNombre(),
+	            usuario.getApellidos(),
+	            usuario.getDni(),
+	            usuario.getDireccion(),
+	            usuario.getTelefono1() != null ? Integer.toString(usuario.getTelefono1()) : "0",
+	            usuario.getTelefono2() != null ? Integer.toString(usuario.getTelefono2()) : "0"
+	        );
+
+	        usuariosTodosString.add(usuarioString);
+	    }
+	    
+	    return usuariosTodosString; // Devuelve la lista de cadenas con todos los atributos de los usuarios
 	}
 
 	@Override

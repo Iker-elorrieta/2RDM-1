@@ -64,4 +64,10 @@ public class Tipos implements java.io.Serializable {
 		this.userses = userses;
 	}
 
+	@Override
+	public String toString() {
+		return Integer.toString(id).trim();
+	}
+	
+
 }

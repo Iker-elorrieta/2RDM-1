@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import javax.swing.table.DefaultTableModel;
 import vista.PanelHorario;
 import vista.Principal;
 import modelo.Reuniones;
+import modelo.Tipos;
 import modelo.Users;
 
 public class Controlador implements ActionListener {
@@ -71,7 +73,7 @@ public class Controlador implements ActionListener {
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
 		// String ip = "10.5.13.47";
-		String ip = "localhost";
+		String ip = "192.168.1.135";
 		try {
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado al servidor.");
@@ -376,8 +378,32 @@ public class Controlador implements ActionListener {
 			String[] datosTodosUsuarios = { vista.Principal.enumAccionesHiloServidor.TODOSUSUARIOS.name() };
 
 			salidaUsuarios.writeObject(String.join(",", datosTodosUsuarios));
-			List<Users> usuarios = (List<Users>) entradaUsuarios.readObject();
+			List<String> usuariosStrings = (List<String>) entradaUsuarios.readObject();
+			List<Users> usuarios = new ArrayList<Users>();
 
+			for(String userTxt : usuariosStrings) {
+				 String[] datosRecibidos =  userTxt.split(",");
+				Users user = new Users();
+				user.setId(Integer.parseInt(datosRecibidos[0].trim()));
+				
+				Tipos newTipo = new Tipos();
+				newTipo.setId(Integer.parseInt(datosRecibidos[1].trim()));
+
+			
+				user.setTipos(newTipo);
+				user.setEmail(datosRecibidos[2]);
+				user.setUsername(datosRecibidos[3]);
+				user.setPassword(datosRecibidos[4]);
+				user.setNombre(datosRecibidos[5]);
+				user.setApellidos(datosRecibidos[6]);
+				user.setDni(datosRecibidos[7]);
+				user.setDireccion(datosRecibidos[8]);
+				user.setTelefono1(Integer.parseInt(datosRecibidos[9].trim()));
+				user.setTelefono2(Integer.parseInt(datosRecibidos[10].trim()));
+				
+				usuarios.add(user);
+			}
+			
 			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0) {
 				for (Users us : usuarios) {
 					if (us.getTipos().getId() != usuarioNoAdmitidoId)
