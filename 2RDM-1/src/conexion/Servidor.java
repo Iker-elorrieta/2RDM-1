@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import controlador.Metodos;
 import modelo.HiloServidor;
 
 public class Servidor {
 	public static void main(String[] args) {
-		Metodos metodos = new Metodos();
 		boolean disponible = true;
 		int puerto = 2000;
 
@@ -25,8 +23,6 @@ public class Servidor {
 
 				HiloServidor hiloLogin = new HiloServidor(socket);
 				hiloLogin.start();
-
-				metodos.conectarJSON();
 
 			}
 			System.out.println("Cliente desconectado.");

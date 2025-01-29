@@ -11,11 +11,11 @@ public class Principal extends JFrame {
 
 	public static enum enumAcciones {
 		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES,
-		CARGAR_TABLA_OTROS_HORARIOS
+		CARGAR_TABLA_OTROS_HORARIOS, PANEL_REUNIONES_NEXT_WEEK, PANEL_REUNIONES_PREVIOUS_WEEK
 	}
 
 	public static enum enumAccionesHiloServidor {
-		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, LEERJSON;
+		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, OBTENERCENTROS;
 	}
 
 	private JPanel panelContenedor;
@@ -40,7 +40,7 @@ public class Principal extends JFrame {
 
 	private void crearPanelContenedor() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(0, 0, 900, 600);
+		setBounds(0, 0, 1068, 691);
 		panelContenedor = new JPanel();
 		panelContenedor.setBackground(new Color(220, 220, 220));
 		panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -50,41 +50,41 @@ public class Principal extends JFrame {
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
-		panelLogin.setBounds(0, 0, 884, 561);
+		panelLogin.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelLogin);
-		panelLogin.setVisible(false); // Ocultar inicialmente
+		panelLogin.setVisible(false);
 
 	}
 
 	private void crearPanelMenu() {
 		panelMenu = new PanelMenu();
-		panelMenu.setBounds(0, 0, 884, 561);
+		panelMenu.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelMenu);
-		panelMenu.setVisible(false); // Ocultar inicialmente
+		panelMenu.setVisible(false);
 
 	}
 
 	private void crearPanelHorario() {
 		panelHorario = new PanelHorario();
-		panelHorario.setBounds(0, 0, 884, 561);
+		panelHorario.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelHorario);
-		panelHorario.setVisible(false); // Ocultar inicialmente
+		panelHorario.setVisible(false);
 
 	}
 
 	private void crearPanelOtrosHorarios() {
 		panelOtrosHorarios = new PanelOtrosHorarios();
-		panelOtrosHorarios.setBounds(0, 0, 884, 561);
+		panelOtrosHorarios.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelOtrosHorarios);
-		panelOtrosHorarios.setVisible(false); // Ocultar inicialmente
+		panelOtrosHorarios.setVisible(false);
 
 	}
 
 	private void crearPanelReuniones() {
 		panelReuniones = new PanelReuniones();
-		panelReuniones.setBounds(0, 0, 884, 561);
+		panelReuniones.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelReuniones);
-		panelReuniones.setVisible(false); // Ocultar inicialmente
+		panelReuniones.setVisible(false);
 
 	}
 

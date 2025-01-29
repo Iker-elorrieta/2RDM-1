@@ -3,6 +3,9 @@ package vista;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,21 +15,23 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.SwingConstants;
 
 public class PanelReuniones extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private JButton btnVolver;
+	private JButton btnVolver, btnNextWeek, btnPreviousWeek;
 	private DefaultTableModel modeloReuniones;
 	private JTable tablaReuniones;
+	private JLabel lblFecha;
 
 	public PanelReuniones() {
 		setBackground(new Color(220, 220, 220));
-		setBounds(0, 0, 884, 561);
+		setBounds(0, 0, 1050, 650);
 		setLayout(null);
 
 		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 70, 842, 425);
+		scrollPane.setBounds(31, 72, 990, 503);
 		add(scrollPane);
 
 		modeloReuniones = new DefaultTableModel(columnas, 0);
@@ -36,7 +41,7 @@ public class PanelReuniones extends JPanel {
 		tablaReuniones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tablaReuniones.setRowSelectionAllowed(false);
 		tablaReuniones.setCellSelectionEnabled(false);
-		tablaReuniones.setRowHeight(67);
+		tablaReuniones.setRowHeight(80);
 		tablaReuniones.getColumnModel().getColumn(0).setMaxWidth(70);
 
 		tablaReuniones.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -63,12 +68,35 @@ public class PanelReuniones extends JPanel {
 		scrollPane.setViewportView(tablaReuniones);
 
 		btnVolver = new JButton("Volver");
-		btnVolver.setBounds(20, 505, 150, 35);
+		btnVolver.setBounds(20, 593, 211, 37);
 		btnVolver.setForeground(Color.WHITE);
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnVolver.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnVolver.setBackground(new Color(100, 100, 100));
 		add(btnVolver);
+
+		LocalDate fechaSemanaActual = LocalDate.now()
+				.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
+
+		lblFecha = new JLabel(fechaSemanaActual + "");
+		lblFecha.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFecha.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblFecha.setBounds(829, 29, 145, 25);
+		add(lblFecha);
+
+		btnNextWeek = new JButton(">");
+		btnNextWeek.setBounds(972, 29, 49, 25);
+		btnNextWeek.setForeground(Color.WHITE);
+		btnNextWeek.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnNextWeek.setBackground(new Color(100, 100, 100));
+		add(btnNextWeek);
+
+		btnPreviousWeek = new JButton("<");
+		btnPreviousWeek.setBounds(781, 29, 49, 25);
+		btnPreviousWeek.setForeground(Color.WHITE);
+		btnPreviousWeek.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnPreviousWeek.setBackground(new Color(100, 100, 100));
+		add(btnPreviousWeek);
 
 	}
 
@@ -90,6 +118,26 @@ public class PanelReuniones extends JPanel {
 
 	public void setTablaReuniones(JTable tablaReuniones) {
 		this.tablaReuniones = tablaReuniones;
+	}
+
+	public JButton getBtnNextWeek() {
+		return btnNextWeek;
+	}
+
+	public JButton getBtnPreviousWeek() {
+		return btnPreviousWeek;
+	}
+
+	public void setBtnVolver(JButton btnVolver) {
+		this.btnVolver = btnVolver;
+	}
+
+	public JLabel getLblFecha() {
+		return lblFecha;
+	}
+
+	public void setLblFecha(JLabel lblFecha) {
+		this.lblFecha = lblFecha;
 	}
 
 }

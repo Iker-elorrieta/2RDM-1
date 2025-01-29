@@ -24,13 +24,13 @@ public class PanelHorario extends JPanel {
 
 	public PanelHorario() {
 		setBackground(new Color(220, 220, 220));
-		setBounds(0, 0, 884, 561);
+		setBounds(0, 0, 1050, 650);
 		setLayout(null);
 
 		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
 		JScrollPane scrollPane = new JScrollPane();
 
-		scrollPane.setBounds(20, 52, 841, 425);
+		scrollPane.setBounds(34, 34, 983, 539);
 		add(scrollPane);
 
 		modeloHorario = new DefaultTableModel(columnas, 0);
@@ -40,7 +40,7 @@ public class PanelHorario extends JPanel {
 		tablaHorario.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tablaHorario.setRowSelectionAllowed(false);
 		tablaHorario.setCellSelectionEnabled(false);
-		tablaHorario.setRowHeight(67);
+		tablaHorario.setRowHeight(86);
 		tablaHorario.getColumnModel().getColumn(0).setMaxWidth(70);
 
 		tablaHorario.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -70,7 +70,7 @@ public class PanelHorario extends JPanel {
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnVolver.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnVolver.setBackground(new Color(100, 100, 100));
-		btnVolver.setBounds(20, 505, 150, 35);
+		btnVolver.setBounds(20, 593, 211, 37);
 		add(btnVolver);
 	}
 

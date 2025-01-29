@@ -52,11 +52,9 @@ public class HiloServidor extends Thread {
 
 				case REUNIONES:
 					reuniones(salida);
-					obtenerCentros(salida);
-
 					break;
 
-				case LEERJSON:
+				case OBTENERCENTROS:
 					obtenerCentros(salida);
 					break;
 				}
@@ -157,17 +155,14 @@ public class HiloServidor extends Thread {
 
 	private void obtenerCentros(ObjectOutputStream salida) throws IOException {
 		Centros c = new Centros();
-		List<Centros> centros = new ArrayList<>();
-		centros = c.leerJson();
+		List<Centros> centros = c.leerJson();
 
 		List<Object[]> listaCentros = new ArrayList<>();
 		for (Centros centro : centros) {
 			listaCentros.add(new Object[] { centro.getId(), centro.getCentro() });
-			System.out.println(centro.getId() + centro.getCentro());
-
 		}
 
 		salida.writeObject(listaCentros);
-
 	}
+
 }

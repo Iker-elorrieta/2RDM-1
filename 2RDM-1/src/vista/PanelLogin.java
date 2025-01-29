@@ -25,12 +25,12 @@ public class PanelLogin extends JPanel {
 	public PanelLogin() {
 
 		setBackground(new Color(220, 220, 220));
-		setBounds(0, 0, 884, 561);
+		setBounds(0, 0, 1050, 650);
 		setLayout(null);
 
 		btnLogin = new JButton("Login");
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnLogin.setBounds(341, 387, 218, 35);
+		btnLogin.setBounds(416, 428, 218, 35);
 		btnLogin.setBackground(new Color(100, 100, 100));
 		btnLogin.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnLogin.setForeground(Color.WHITE);
@@ -38,27 +38,27 @@ public class PanelLogin extends JPanel {
 
 		txtFUser = new JTextField();
 		txtFUser.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		txtFUser.setBounds(438, 224, 248, 35);
+		txtFUser.setBounds(508, 265, 248, 35);
 		add(txtFUser);
 		txtFUser.setColumns(10);
 
 		pswdFPassword = new JPasswordField();
 		pswdFPassword.setFont(new Font("Tahoma", Font.PLAIN, 17));
-		pswdFPassword.setBounds(438, 278, 248, 35);
+		pswdFPassword.setBounds(508, 321, 248, 35);
 		add(pswdFPassword);
 
 		lblUser = new JLabel("Usuario");
 		lblUser.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblUser.setBounds(251, 223, 151, 35);
+		lblUser.setBounds(321, 264, 151, 35);
 		add(lblUser);
 
 		lblPswd = new JLabel("Contraseña");
 		lblPswd.setFont(new Font("Tahoma", Font.BOLD, 17));
-		lblPswd.setBounds(251, 278, 151, 35);
+		lblPswd.setBounds(321, 321, 151, 35);
 		add(lblPswd);
 
 		lblImage = new JLabel();
-		lblImage.setBounds(224, 50, 435, 127);
+		lblImage.setBounds(307, 50, 435, 127);
 		File imageFile = new File("media/elorrieta-logo.png");
 
 		if (imageFile.exists()) {
@@ -71,7 +71,7 @@ public class PanelLogin extends JPanel {
 			lblTitle = new JLabel("Elorrieta-Errekamari");
 			lblTitle.setFont(new Font("Tahoma", Font.BOLD, 40));
 			lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
-			lblTitle.setBounds(198, 81, 487, 71);
+			lblTitle.setBounds(281, 81, 487, 71);
 			add(lblTitle);
 		}
 		add(lblImage);

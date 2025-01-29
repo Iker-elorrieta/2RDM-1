@@ -17,12 +17,13 @@ public class Centros implements Serializable {
 	private int id;
 	private String centro;
 
-	public Centros(int i, String string) {
-
+	public Centros(int id, String centro) {
+		super();
+		this.id = id;
+		this.centro = centro;
 	}
 
 	public Centros() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public int getId() {
@@ -64,6 +65,5 @@ public class Centros implements Serializable {
 			e.printStackTrace();
 		}
 		return centros;
-
 	}
 }
