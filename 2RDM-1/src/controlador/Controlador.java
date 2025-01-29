@@ -266,9 +266,8 @@ public class Controlador implements ActionListener {
 
 		byte[] resumen = md.digest();
 
-		for (byte b : resumen) {
+		for (byte b : resumen)
 			resumenString.append(String.format("%02x", b));
-		}
 
 		return resumenString.toString();
 	}
@@ -324,9 +323,9 @@ public class Controlador implements ActionListener {
 			}
 
 			Object[][] data = new Object[6][6];
-			for (int h = 0; h < 6; h++) {
+
+			for (int h = 0; h < 6; h++)
 				data[h][0] = "Hora " + (h + 1);
-			}
 
 			for (Object[] horarioData : horarios) {
 				String dia = (String) horarioData[0];
@@ -356,9 +355,8 @@ public class Controlador implements ActionListener {
 
 			modelo.setRowCount(0);
 
-			for (Object[] row : data) {
+			for (Object[] row : data)
 				modelo.addRow(row);
-			}
 
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, horarioError, error, JOptionPane.ERROR_MESSAGE);
@@ -380,11 +378,12 @@ public class Controlador implements ActionListener {
 			salidaUsuarios.writeObject(String.join(",", datosTodosUsuarios));
 			List<Users> usuarios = (List<Users>) entradaUsuarios.readObject();
 
-			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0)
+			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0) {
 				for (Users us : usuarios) {
 					if (us.getTipos().getId() != usuarioNoAdmitidoId)
 						this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
 				}
+			}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -410,7 +409,7 @@ public class Controlador implements ActionListener {
 
 			Map<Integer, String> mapaCentros = cargarCentros();
 
-			// Obtener la fecha mostrada en el lblFecha y calcular la semana
+			// Obtiene la fecha mostrada en el lblFecha y calcular la semana
 			LocalDate fechaSemanaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
 			LocalDate inicioSemana = fechaSemanaActual.with(DayOfWeek.MONDAY);
 			LocalDate finSemana = fechaSemanaActual.with(DayOfWeek.SUNDAY);
@@ -424,10 +423,9 @@ public class Controlador implements ActionListener {
 				int[] fecha = formatearFecha(reuniones.get(i).getFecha());
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
-				// Solo procesamos la reunión si está dentro de la semana actual
 				if (!localDate.isBefore(inicioSemana) && !localDate.isAfter(finSemana)) {
 					String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
-					// Obtener el nombre del centro usando el mapa
+
 					String nombreCentro = mapaCentros
 							.getOrDefault(Integer.parseInt(reuniones.get(i).getIdCentro().toString()), "Desconocido");
 
@@ -457,12 +455,10 @@ public class Controlador implements ActionListener {
 				}
 			}
 
-			// Limpiar la tabla antes de agregar las filas
 			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
 
-			for (Object[] row : data) {
+			for (Object[] row : data)
 				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(row);
-			}
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
