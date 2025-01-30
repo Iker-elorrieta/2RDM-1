@@ -1,9 +1,12 @@
 package controlador;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,12 +19,12 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import vista.PanelHorario;
@@ -499,6 +502,8 @@ public class Controlador implements ActionListener {
 
 			this.vistaPrincipal.getPanelReuniones().setCellColors(cellColors);
 
+			renderTable(cellColors, true, this.vistaPrincipal.getPanelReuniones().getTablaReuniones());
+
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -586,7 +591,23 @@ public class Controlador implements ActionListener {
 		mCargarReuniones();
 	}
 
-	private void renderTable() {
+	private void renderTable(Map<Point, Color> cellColors, boolean reuniones, JTable tabla) {
+		tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			private static final long serialVersionUID = 1L;
 
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+						column);
+				label.setText(value != null ? "<html>" + value.toString().replace("\n", "<br>") + "</html>" : "");
+				label.setOpaque(true);
+				label.setHorizontalAlignment(JLabel.LEFT);
+				label.setVerticalAlignment(JLabel.TOP);
+				if (reuniones)
+					label.setBackground(cellColors.getOrDefault(new Point(row, column), Color.WHITE));
+				return label;
+			}
+		});
 	}
 }

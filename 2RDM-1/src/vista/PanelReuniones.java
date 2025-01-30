@@ -1,7 +1,6 @@
 package vista;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.SwingConstants;
 
@@ -45,39 +43,6 @@ public class PanelReuniones extends JPanel {
 		tablaReuniones.setCellSelectionEnabled(false);
 		tablaReuniones.setRowHeight(80);
 		tablaReuniones.getColumnModel().getColumn(0).setMaxWidth(70);
-
-		tablaReuniones.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-			private static final long serialVersionUID = -2911240376199387811L;
-
-			@Override
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-					boolean hasFocus, int row, int column) {
-				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
-						column);
-				label.setText(value != null ? "<html>" + value.toString().replace("\n", "<br>") + "</html>" : "");
-				label.setOpaque(true);
-				label.setHorizontalAlignment(JLabel.LEFT);
-				label.setVerticalAlignment(JLabel.TOP);
-				label.setBackground(cellColors.getOrDefault(new Point(row, column), Color.WHITE));
-				return label;
-			}
-		});
-
-		/*
-		 * this.vistaPrincipal.getPanelReuniones().getTablaReuniones().
-		 * setDefaultRenderer(Object.class, new DefaultTableCellRenderer() { private
-		 * static final long serialVersionUID = 1L;
-		 * 
-		 * @Override public Component getTableCellRendererComponent(JTable table, Object
-		 * value, boolean isSelected, boolean hasFocus, int row, int column) { JLabel
-		 * label = (JLabel) super.getTableCellRendererComponent(table, value,
-		 * isSelected, hasFocus, row, column); label.setText( value != null ? "<html>" +
-		 * value.toString().replace("\n", "<br>") + "</html>" : "");
-		 * label.setOpaque(true); label.setHorizontalAlignment(JLabel.LEFT);
-		 * label.setVerticalAlignment(JLabel.TOP);
-		 * label.setBackground(cellColors.getOrDefault(new Point(row, column),
-		 * Color.WHITE)); return label; } });
-		 */
 		tablaReuniones.setDefaultEditor(Object.class, null);
 
 		scrollPane.setViewportView(tablaReuniones);
