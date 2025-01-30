@@ -127,13 +127,11 @@ public class Reuniones implements java.io.Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Reuniones> reuniones(Session session) {
-		String hql = "FROM Reuniones WHERE usersByProfesorId.id=" + usersByProfesorId.getId();
-		Query q = session.createQuery(hql);
+	public List<Reuniones> getReunionesById(int i, Session session) {
+		String hql = "FROM Reuniones WHERE usersByProfesorId.id=" + i;
+		Query query = session.createQuery(hql);
 
-		List<Reuniones> reuniones = new ArrayList<Reuniones>();
-
-		reuniones = q.list();
+		List<Reuniones> reuniones = query.list();
 
 		return reuniones;
 	}

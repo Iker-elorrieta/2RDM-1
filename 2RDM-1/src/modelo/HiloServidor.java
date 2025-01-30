@@ -31,7 +31,7 @@ public class HiloServidor extends Thread {
 				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
-				datosRecibidos = ((String) entrada.readObject()).split(",");
+				this.datosRecibidos = (String[]) entrada.readObject();
 
 				Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
 						.valueOf(datosRecibidos[0]);
@@ -51,7 +51,7 @@ public class HiloServidor extends Thread {
 					break;
 
 				case REUNIONES:
-					reuniones(salida);
+					reunion(salida);
 					break;
 
 				case OBTENERCENTROS:
@@ -117,7 +117,7 @@ public class HiloServidor extends Thread {
 
 		};
 
-		salida.writeObject(String.join(",", datosUsuario));
+		salida.writeObject(datosUsuario);
 
 	}
 
@@ -138,19 +138,23 @@ public class HiloServidor extends Thread {
 
 	private void todosUsuarios(ObjectOutputStream salida) throws IOException {
 		Users usuariosTodos = new Users();
-		salida.writeObject(usuariosTodos.todosUsers(session));
+		List<Object[]> usuarios = usuariosTodos.todosUsers(session);
 
+		salida.writeObject(usuarios);
 	}
 
-	private void reuniones(ObjectOutputStream salida) throws IOException {
-
+	private void reunion(ObjectOutputStream salida) throws IOException {
 		Reuniones r = new Reuniones();
-		Users u = new Users();
-		u.setId(Integer.parseInt(datosRecibidos[1]));
-		r.setUsersByProfesorId(u);
+		List<Reuniones> reuniones = new ArrayList<>();
+		reuniones = r.getReunionesById(Integer.parseInt(datosRecibidos[1]), session);
 
-		salida.writeObject(r.reuniones(session));
+		List<Object[]> listaReuniones = new ArrayList<>();
+		for (Reuniones reunion : reuniones) {
+			listaReuniones.add(new Object[] { reunion.getAsunto(), reunion.getAula(), reunion.getEstado(),
+					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo() });
+		}
 
+		salida.writeObject(listaReuniones);
 	}
 
 	private void obtenerCentros(ObjectOutputStream salida) throws IOException {

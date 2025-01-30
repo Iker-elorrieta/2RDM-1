@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JLabel;
@@ -217,11 +218,9 @@ public class Controlador implements ActionListener {
 
 			String[] datosLogin = { vista.Principal.enumAccionesHiloServidor.LOGIN.name(), hash(user), hash(pswd) };
 
-			salidaLogin.writeObject(String.join(",", datosLogin));
+			salidaLogin.writeObject(datosLogin);
 
-			String[] datosUsuario = null;
-
-			datosUsuario = ((String) entradaLogin.readObject()).split(",");
+			String[] datosUsuario = (String[]) entradaLogin.readObject();
 
 			if (datosUsuario == null || datosUsuario[0].equals("-1")) {
 				// Login incorrecto
@@ -323,7 +322,7 @@ public class Controlador implements ActionListener {
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
 			String[] horario = { vista.Principal.enumAccionesHiloServidor.HORARIO.name(), String.valueOf(userId) };
-			salida.writeObject(String.join(",", horario));
+			salida.writeObject(horario);
 
 			List<Object[]> horarios = (List<Object[]>) entrada.readObject();
 
@@ -384,44 +383,49 @@ public class Controlador implements ActionListener {
 			ObjectInputStream entradaUsuarios = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosTodosUsuarios = { vista.Principal.enumAccionesHiloServidor.TODOSUSUARIOS.name() };
+			salidaUsuarios.writeObject(datosTodosUsuarios);
 
-			salidaUsuarios.writeObject(String.join(",", datosTodosUsuarios));
-			List<String> usuariosStrings = (List<String>) entradaUsuarios.readObject();
-			List<Users> usuarios = new ArrayList<Users>();
+			List<Object[]> usuariosData = (List<Object[]>) entradaUsuarios.readObject();
 
-			for (String userTxt : usuariosStrings) {
-				String[] datosRecibidos = userTxt.split(",");
-				Users user = new Users();
-				user.setId(Integer.parseInt(datosRecibidos[0].trim()));
+			if (usuariosData == null || usuariosData.isEmpty()) {
+				System.out.println("No se recibieron usuarios.");
+				return;
+			}
 
-				Tipos newTipo = new Tipos();
-				newTipo.setId(Integer.parseInt(datosRecibidos[1].trim()));
+			List<Users> usuarios = new ArrayList<>();
+			for (Object[] usuarioData : usuariosData) {
+				Users us = new Users();
+				us.setId((Integer) usuarioData[0]);
+				us.setUsername((String) usuarioData[1]);
+				us.setNombre((String) usuarioData[2]);
+				us.setEmail((String) usuarioData[3]);
 
-				user.setTipos(newTipo);
-				user.setEmail(datosRecibidos[2]);
-				user.setUsername(datosRecibidos[3]);
-				user.setPassword(datosRecibidos[4]);
-				user.setNombre(datosRecibidos[5]);
-				user.setApellidos(datosRecibidos[6]);
-				user.setDni(datosRecibidos[7]);
-				user.setDireccion(datosRecibidos[8]);
-				user.setTelefono1(Integer.parseInt(datosRecibidos[9].trim()));
-				user.setTelefono2(Integer.parseInt(datosRecibidos[10].trim()));
+				Tipos tipo = new Tipos();
+				tipo.setId((Integer) usuarioData[4]);
+				us.setTipos(tipo);
 
-				usuarios.add(user);
+				us.setPassword((String) usuarioData[5]);
+				us.setApellidos((String) usuarioData[6]);
+				us.setDni((String) usuarioData[7]);
+				us.setDireccion((String) usuarioData[8]);
+				us.setTelefono1((Integer) usuarioData[9]);
+				us.setTelefono2((Integer) usuarioData[10]);
+
+				usuarios.add(us);
 			}
 
 			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0) {
 				for (Users us : usuarios) {
-					if (us.getTipos().getId() != usuarioNoAdmitidoId)
+					if (us.getTipos().getId() != usuarioNoAdmitidoId) {
 						this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
+					}
 				}
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
+			System.out.println("Error al cargar usuarios: " + e.getMessage());
 			e.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -435,7 +439,9 @@ public class Controlador implements ActionListener {
 
 			String[] datosReuniones = { vista.Principal.enumAccionesHiloServidor.REUNIONES.name(),
 					Integer.toString(idUsuarioLogeado) };
-			sReuniones.writeObject(String.join(",", datosReuniones));
+
+			// Enviar el array directamente
+			sReuniones.writeObject(datosReuniones);
 
 			@SuppressWarnings("unchecked")
 			List<Reuniones> reuniones = (List<Reuniones>) eReuniones.readObject();
@@ -543,12 +549,12 @@ public class Controlador implements ActionListener {
 	/**
 	 * Obtiene la fecha de la reunión y la separa en un array.
 	 * 
-	 * @param fecha
+	 * @param timestamp
 	 * @return int[] resultado
 	 */
-	private int[] formatearFecha(Timestamp fecha) {
+	private int[] formatearFecha(Timestamp timestamp) {
 
-		String[] partesFechaHora = fecha.toString().split(" ");
+		String[] partesFechaHora = timestamp.toString().split(" ");
 
 		String soloFecha = partesFechaHora[0];
 		String soloHora = partesFechaHora[1];
