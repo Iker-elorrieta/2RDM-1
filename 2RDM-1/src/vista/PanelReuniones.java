@@ -3,8 +3,9 @@ package vista;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
+import java.awt.Point;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,6 +24,7 @@ public class PanelReuniones extends JPanel {
 	private DefaultTableModel modeloReuniones;
 	private JTable tablaReuniones;
 	private JLabel lblFecha;
+	Map<Point, Color> cellColors = new HashMap<>();
 
 	public PanelReuniones() {
 		setBackground(new Color(220, 220, 220));
@@ -52,17 +54,30 @@ public class PanelReuniones extends JPanel {
 					boolean hasFocus, int row, int column) {
 				JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
 						column);
-
-				label.setText(value != null ? value.toString() : "");
+				label.setText(value != null ? "<html>" + value.toString().replace("\n", "<br>") + "</html>" : "");
 				label.setOpaque(true);
 				label.setHorizontalAlignment(JLabel.LEFT);
 				label.setVerticalAlignment(JLabel.TOP);
-				label.setText("<html>" + label.getText().replace("\n", "<br>") + "</html>");
-
+				label.setBackground(cellColors.getOrDefault(new Point(row, column), Color.WHITE));
 				return label;
 			}
 		});
 
+		/*
+		 * this.vistaPrincipal.getPanelReuniones().getTablaReuniones().
+		 * setDefaultRenderer(Object.class, new DefaultTableCellRenderer() { private
+		 * static final long serialVersionUID = 1L;
+		 * 
+		 * @Override public Component getTableCellRendererComponent(JTable table, Object
+		 * value, boolean isSelected, boolean hasFocus, int row, int column) { JLabel
+		 * label = (JLabel) super.getTableCellRendererComponent(table, value,
+		 * isSelected, hasFocus, row, column); label.setText( value != null ? "<html>" +
+		 * value.toString().replace("\n", "<br>") + "</html>" : "");
+		 * label.setOpaque(true); label.setHorizontalAlignment(JLabel.LEFT);
+		 * label.setVerticalAlignment(JLabel.TOP);
+		 * label.setBackground(cellColors.getOrDefault(new Point(row, column),
+		 * Color.WHITE)); return label; } });
+		 */
 		tablaReuniones.setDefaultEditor(Object.class, null);
 
 		scrollPane.setViewportView(tablaReuniones);
@@ -75,10 +90,7 @@ public class PanelReuniones extends JPanel {
 		btnVolver.setBackground(new Color(100, 100, 100));
 		add(btnVolver);
 
-		LocalDate fechaSemanaActual = LocalDate.now()
-				.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
-
-		lblFecha = new JLabel(fechaSemanaActual + "");
+		lblFecha = new JLabel("");
 		lblFecha.setHorizontalAlignment(SwingConstants.CENTER);
 		lblFecha.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblFecha.setBounds(829, 29, 145, 25);
@@ -108,18 +120,6 @@ public class PanelReuniones extends JPanel {
 		return modeloReuniones;
 	}
 
-	public void setModeloReuniones(DefaultTableModel modeloReuniones) {
-		this.modeloReuniones = modeloReuniones;
-	}
-
-	public JTable getTablaReuniones() {
-		return tablaReuniones;
-	}
-
-	public void setTablaReuniones(JTable tablaReuniones) {
-		this.tablaReuniones = tablaReuniones;
-	}
-
 	public JButton getBtnNextWeek() {
 		return btnNextWeek;
 	}
@@ -128,16 +128,20 @@ public class PanelReuniones extends JPanel {
 		return btnPreviousWeek;
 	}
 
-	public void setBtnVolver(JButton btnVolver) {
-		this.btnVolver = btnVolver;
-	}
-
 	public JLabel getLblFecha() {
 		return lblFecha;
 	}
 
-	public void setLblFecha(JLabel lblFecha) {
-		this.lblFecha = lblFecha;
+	public JTable getTablaReuniones() {
+		return tablaReuniones;
+	}
+
+	public Map<Point, Color> getCellColors() {
+		return cellColors;
+	}
+
+	public void setCellColors(Map<Point, Color> cellColors) {
+		this.cellColors = cellColors;
 	}
 
 }

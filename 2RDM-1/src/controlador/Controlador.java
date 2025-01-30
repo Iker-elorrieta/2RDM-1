@@ -1,5 +1,7 @@
 package controlador;
 
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +42,8 @@ public class Controlador implements ActionListener {
 	private Socket socket = null;
 	private int idUsuarioLogeado = 0;
 	private PanelHorario panelHorario;
-
+	private LocalDate fechaSemanaActual = LocalDate.now()
+			.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
 	private int usuarioNoAdmitidoId = 4;
 
 	private final static String error = "Error", aviso = "Aviso";
@@ -73,7 +77,7 @@ public class Controlador implements ActionListener {
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
 		// String ip = "10.5.13.47";
-		String ip = "192.168.1.135";
+		String ip = "localhost";
 		try {
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado al servidor.");
@@ -166,6 +170,7 @@ public class Controlador implements ActionListener {
 			mCargarDatosOtrosHorarios();
 			break;
 		case PANEL_REUNIONES:
+			this.vistaPrincipal.getPanelReuniones().getLblFecha().setText(fechaSemanaActual + "");
 			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
 			mCargarReuniones();
 			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES);
@@ -381,15 +386,14 @@ public class Controlador implements ActionListener {
 			List<String> usuariosStrings = (List<String>) entradaUsuarios.readObject();
 			List<Users> usuarios = new ArrayList<Users>();
 
-			for(String userTxt : usuariosStrings) {
-				 String[] datosRecibidos =  userTxt.split(",");
+			for (String userTxt : usuariosStrings) {
+				String[] datosRecibidos = userTxt.split(",");
 				Users user = new Users();
 				user.setId(Integer.parseInt(datosRecibidos[0].trim()));
-				
+
 				Tipos newTipo = new Tipos();
 				newTipo.setId(Integer.parseInt(datosRecibidos[1].trim()));
 
-			
 				user.setTipos(newTipo);
 				user.setEmail(datosRecibidos[2]);
 				user.setUsername(datosRecibidos[3]);
@@ -400,10 +404,10 @@ public class Controlador implements ActionListener {
 				user.setDireccion(datosRecibidos[8]);
 				user.setTelefono1(Integer.parseInt(datosRecibidos[9].trim()));
 				user.setTelefono2(Integer.parseInt(datosRecibidos[10].trim()));
-				
+
 				usuarios.add(user);
 			}
-			
+
 			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0) {
 				for (Users us : usuarios) {
 					if (us.getTipos().getId() != usuarioNoAdmitidoId)
@@ -440,51 +444,60 @@ public class Controlador implements ActionListener {
 			LocalDate inicioSemana = fechaSemanaActual.with(DayOfWeek.MONDAY);
 			LocalDate finSemana = fechaSemanaActual.with(DayOfWeek.SUNDAY);
 
-			String data[][] = new String[6][6];
+			String[][] data = new String[6][6];
+			Map<Point, Color> cellColors = new HashMap<>();
 
-			for (int h = 0; h < 6; h++)
+			for (int h = 0; h < 6; h++) {
 				data[h][0] = "Hora " + (h + 1);
+			}
 
-			for (int i = 0; i < reuniones.size(); i++) {
-				int[] fecha = formatearFecha(reuniones.get(i).getFecha());
+			for (Reuniones reunion : reuniones) {
+				int[] fecha = formatearFecha(reunion.getFecha());
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
 				if (!localDate.isBefore(inicioSemana) && !localDate.isAfter(finSemana)) {
 					String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
+					String nombreCentro = mapaCentros.getOrDefault(Integer.parseInt(reunion.getIdCentro().toString()),
+							"Desconocido");
+					String reunionInfo = reunion.getTitulo() + "\n" + nombreCentro + "\n Aula: " + reunion.getAula();
 
-					String nombreCentro = mapaCentros
-							.getOrDefault(Integer.parseInt(reuniones.get(i).getIdCentro().toString()), "Desconocido");
+					int rowIndex = fecha[6] - 1;
+					int columnIndex = switch (dia.toLowerCase()) {
+					case "lunes" -> 1;
+					case "martes" -> 2;
+					case "miércoles" -> 3;
+					case "jueves" -> 4;
+					case "viernes" -> 5;
+					default -> -1;
+					};
 
-					String reunionInfo = reuniones.get(i).getTitulo();
-					reunionInfo += "\n " + nombreCentro;
-					reunionInfo += "\n Aula: " + reuniones.get(i).getAula();
+					if (columnIndex != -1) {
+						data[rowIndex][columnIndex] = reunionInfo;
+						switch (reunion.getEstado()) {
+						case "pendiente":
+							cellColors.put(new Point(rowIndex, columnIndex), Color.YELLOW);
+							break;
+						case "aceptada":
+							cellColors.put(new Point(rowIndex, columnIndex), Color.GREEN);
+							break;
+						case "denegada":
+							cellColors.put(new Point(rowIndex, columnIndex), Color.RED);
+							break;
+						case "conflicto":
+							cellColors.put(new Point(rowIndex, columnIndex), Color.GRAY);
+							break;
 
-					switch (dia) {
-					case "lunes":
-						data[fecha[6] - 1][1] = reunionInfo;
-						break;
-					case "martes":
-						data[fecha[6] - 1][2] = reunionInfo;
-						break;
-					case "miércoles":
-						data[fecha[6] - 1][3] = reunionInfo;
-						break;
-					case "jueves":
-						data[fecha[6] - 1][4] = reunionInfo;
-						break;
-					case "viernes":
-						data[fecha[6] - 1][5] = reunionInfo;
-						break;
-					default:
-						break;
+						}
 					}
 				}
 			}
 
 			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
 
-			for (Object[] row : data)
+			for (String[] row : data)
 				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(row);
+
+			this.vistaPrincipal.getPanelReuniones().setCellColors(cellColors);
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -556,6 +569,12 @@ public class Controlador implements ActionListener {
 		return resultado;
 	}
 
+	/**
+	 * Avanza o retrocede una semana según lo que el usuario indique en el
+	 * panelReuniones para visualizar sus reuniones.
+	 * 
+	 * @param i
+	 */
 	private void cambiarSemana(int i) {
 		LocalDate fechaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
 
@@ -567,4 +586,7 @@ public class Controlador implements ActionListener {
 		mCargarReuniones();
 	}
 
+	private void renderTable() {
+
+	}
 }

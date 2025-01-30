@@ -63,7 +63,7 @@ public class HiloServidor extends Thread {
 			}
 
 		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
+			System.out.println("Cliente " + cliente.getInetAddress() + " desconectado (" + e.getMessage() + ")");
 		}
 
 	}
