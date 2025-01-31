@@ -187,6 +187,11 @@ public class Controlador implements ActionListener {
 		case PANEL_REUNIONES_PREVIOUS_WEEK:
 			cambiarSemana(previous);
 			break;
+		case PANEL_REUNIONES_ACEPTAR:
+			
+			break;
+		case PANEL_REUNIONES_RECHAZAR:
+			break;
 
 		default:
 			break;

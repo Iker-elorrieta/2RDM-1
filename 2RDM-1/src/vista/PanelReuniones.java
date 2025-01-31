@@ -15,10 +15,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 public class PanelReuniones extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private JButton btnVolver, btnNextWeek, btnPreviousWeek;
+	private JButton btnVolver, btnNextWeek, btnPreviousWeek, btnAceptar, btnRechazar;
 	private DefaultTableModel modeloReuniones;
 	private JTable tablaReuniones;
 	private JLabel lblFecha;
@@ -74,6 +75,20 @@ public class PanelReuniones extends JPanel {
 		btnPreviousWeek.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnPreviousWeek.setBackground(new Color(100, 100, 100));
 		add(btnPreviousWeek);
+
+		btnAceptar = new JButton("Aceptar");
+		btnAceptar.setForeground(Color.WHITE);
+		btnAceptar.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnAceptar.setBackground(UIManager.getColor("windowBorder"));
+		btnAceptar.setBounds(876, 593, 145, 37);
+		add(btnAceptar);
+
+		btnRechazar = new JButton("Rechazar");
+		btnRechazar.setForeground(Color.WHITE);
+		btnRechazar.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnRechazar.setBackground(UIManager.getColor("windowBorder"));
+		btnRechazar.setBounds(706, 593, 145, 37);
+		add(btnRechazar);
 
 	}
 
