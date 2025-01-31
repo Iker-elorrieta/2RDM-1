@@ -82,6 +82,7 @@ public class Controlador implements ActionListener {
 		int puerto = 2000;
 		// String ip = "10.5.13.47";
 		String ip = "localhost";
+
 		try {
 			socket = new Socket(ip, puerto);
 			System.out.println("Conectado al servidor.");
