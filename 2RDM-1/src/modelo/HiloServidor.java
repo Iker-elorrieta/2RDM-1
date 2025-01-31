@@ -26,60 +26,58 @@ public class HiloServidor extends Thread {
 	@Override
 	public void run() {
 		try {
-
 			while (cliente.isConnected()) {
 				ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 				ObjectOutputStream salida = new ObjectOutputStream(cliente.getOutputStream());
 
-				this.datosRecibidos = (String[]) entrada.readObject();
+				Object obj = entrada.readObject();
 
-				Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
-						.valueOf(datosRecibidos[0]);
+				if (obj instanceof String[]) {
+					this.datosRecibidos = (String[]) obj;
 
-				switch (accion) {
+					Principal.enumAccionesHiloServidor accion = Principal.enumAccionesHiloServidor
+							.valueOf(datosRecibidos[0]);
 
-				case LOGIN:
-					login(salida);
-					break;
+					switch (accion) {
+					case LOGIN:
+						login(salida);
+						break;
+					case HORARIO:
+						horario(salida);
+						break;
+					case TODOSUSUARIOS:
+						todosUsuarios(salida);
+						break;
+					case REUNIONES:
+						reunion(salida);
+						break;
+					case OBTENERCENTROS:
+						obtenerCentros(salida);
+						break;
+					case OBTENERMATRICULACIONES:
+						obtenerMatricula(salida);
+						break;
+					}
 
-				case HORARIO:
-					horario(salida);
-					break;
-
-				case TODOSUSUARIOS:
-					todosUsuarios(salida);
-					break;
-
-				case REUNIONES:
-					reunion(salida);
-					break;
-
-				case OBTENERCENTROS:
-					obtenerCentros(salida);
-					break;
-				case OBTENERMATRICULACIONES:
-					obtenerMatricula(salida);
-					break;
+					salida.flush();
+				} else {
+					System.err.println("Se esperaba un String[], se recibió: " + obj.getClass().getName());
 				}
-
-				salida.flush();
 			}
-
 		} catch (IOException | ClassNotFoundException e) {
-			System.out.println("Cliente " + cliente.getInetAddress() + " desconectado (" + e.getMessage() + ")");
+			System.out.println("Cliente " + cliente.getInetAddress().toString().replace("/", "") + " desconectado.");
 		}
-
 	}
 
 	private void obtenerMatricula(ObjectOutputStream salida) {
-			Matriculaciones matriculas = new Matriculaciones();
-			String matriculaAlumno = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]),session);
-			try {
-				salida.writeObject(matriculaAlumno);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		
+		Matriculaciones matriculas = new Matriculaciones();
+		String matriculaAlumno = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]), session);
+		try {
+			salida.writeObject(matriculaAlumno);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void login(ObjectOutputStream salida) throws IOException {
@@ -164,8 +162,8 @@ public class HiloServidor extends Thread {
 
 		List<Object[]> listaReuniones = new ArrayList<>();
 		for (Reuniones reunion : reuniones) {
-			listaReuniones.add(new Object[] { reunion.getAsunto(), reunion.getAula(), reunion.getEstado(),
-					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo() });
+			listaReuniones.add(new Object[] { reunion.getIdCentro(), reunion.getAsunto(), reunion.getAula(),
+					reunion.getEstado(), reunion.getFecha(), reunion.getTitulo() });
 		}
 
 		salida.writeObject(listaReuniones);
@@ -173,7 +171,8 @@ public class HiloServidor extends Thread {
 
 	private void obtenerCentros(ObjectOutputStream salida) throws IOException {
 		Centros c = new Centros();
-		List<Centros> centros = c.leerJson();
+		List<Centros> centros = new ArrayList<>();
+		centros = c.leerJson();
 
 		List<Object[]> listaCentros = new ArrayList<>();
 		for (Centros centro : centros) {

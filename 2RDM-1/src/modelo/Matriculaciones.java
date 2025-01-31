@@ -53,11 +53,7 @@ public class Matriculaciones implements java.io.Serializable {
 	    Query q = session.createQuery(hql);
 	    Matriculaciones matriculacion = (Matriculaciones) q.uniqueResult();
 	    
-	    String datosMatricula = String.join(", ",
-	    		matriculacion.getCiclos().getNombre(),
-	    		Integer.toString(matriculacion.getId().getCurso())
-	        );
-	    
+	    String datosMatricula = null;/* = {matriculacion.getCiclos().getNombre(),Integer.toString(matriculacion.getId().getCurso())};*/
 	    
 		return datosMatricula;
 		
