@@ -13,13 +13,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JLabel;
@@ -30,7 +28,6 @@ import javax.swing.table.DefaultTableModel;
 
 import vista.PanelHorario;
 import vista.Principal;
-import modelo.Reuniones;
 import modelo.Tipos;
 import modelo.Users;
 
@@ -439,17 +436,14 @@ public class Controlador implements ActionListener {
 			ObjectInputStream eReuniones = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosReuniones = { vista.Principal.enumAccionesHiloServidor.REUNIONES.name(),
-					Integer.toString(idUsuarioLogeado) };
-
-			// Enviar el array directamente
+					String.valueOf(idUsuarioLogeado) };
 			sReuniones.writeObject(datosReuniones);
 
 			@SuppressWarnings("unchecked")
-			List<Reuniones> reuniones = (List<Reuniones>) eReuniones.readObject();
+			List<Object[]> reuniones = (List<Object[]>) eReuniones.readObject();
 
 			Map<Integer, String> mapaCentros = cargarCentros();
 
-			// Obtiene la fecha mostrada en el lblFecha y calcular la semana
 			LocalDate fechaSemanaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
 			LocalDate inicioSemana = fechaSemanaActual.with(DayOfWeek.MONDAY);
 			LocalDate finSemana = fechaSemanaActual.with(DayOfWeek.SUNDAY);
@@ -461,15 +455,14 @@ public class Controlador implements ActionListener {
 				data[h][0] = "Hora " + (h + 1);
 			}
 
-			for (Reuniones reunion : reuniones) {
-				int[] fecha = formatearFecha(reunion.getFecha());
+			for (Object[] reunionData : reuniones) {
+				int[] fecha = formatearFecha(reunionData[4].toString());
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
 				if (!localDate.isBefore(inicioSemana) && !localDate.isAfter(finSemana)) {
 					String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
-					String nombreCentro = mapaCentros.getOrDefault(Integer.parseInt(reunion.getIdCentro().toString()),
-							"Desconocido");
-					String reunionInfo = reunion.getTitulo() + "\n" + nombreCentro + "\n Aula: " + reunion.getAula();
+					String nombreCentro = mapaCentros.getOrDefault(reunionData[0], "Desconocido");
+					String reunionInfo = reunionData[5] + "\n" + nombreCentro + "\n Aula: " + reunionData[2];
 
 					int rowIndex = fecha[6] - 1;
 					int columnIndex = switch (dia.toLowerCase()) {
@@ -483,7 +476,7 @@ public class Controlador implements ActionListener {
 
 					if (columnIndex != -1) {
 						data[rowIndex][columnIndex] = reunionInfo;
-						switch (reunion.getEstado()) {
+						switch (reunionData[3].toString().toLowerCase()) {
 						case "pendiente":
 							cellColors.put(new Point(rowIndex, columnIndex), Color.YELLOW);
 							break;
@@ -531,7 +524,7 @@ public class Controlador implements ActionListener {
 		ObjectInputStream eCentros = new ObjectInputStream(socket.getInputStream());
 
 		String[] datosCentros = { vista.Principal.enumAccionesHiloServidor.OBTENERCENTROS.name() };
-		sCentros.writeObject(String.join(",", datosCentros));
+		sCentros.writeObject(datosCentros);
 
 		@SuppressWarnings("unchecked")
 		List<Object[]> listaCentros = (List<Object[]>) eCentros.readObject();
@@ -550,12 +543,12 @@ public class Controlador implements ActionListener {
 	/**
 	 * Obtiene la fecha de la reunión y la separa en un array.
 	 * 
-	 * @param timestamp
+	 * @param string
 	 * @return int[] resultado
 	 */
-	private int[] formatearFecha(Timestamp timestamp) {
+	private int[] formatearFecha(String string) {
 
-		String[] partesFechaHora = timestamp.toString().split(" ");
+		String[] partesFechaHora = string.toString().split(" ");
 
 		String soloFecha = partesFechaHora[0];
 		String soloHora = partesFechaHora[1];
