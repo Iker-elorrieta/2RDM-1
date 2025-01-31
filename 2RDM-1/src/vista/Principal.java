@@ -15,7 +15,7 @@ public class Principal extends JFrame {
 	}
 
 	public static enum enumAccionesHiloServidor {
-		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, OBTENERCENTROS;
+		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, OBTENERCENTROS,OBTENERMATRICULACIONES;
 	}
 
 	private JPanel panelContenedor;

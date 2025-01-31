@@ -57,6 +57,9 @@ public class HiloServidor extends Thread {
 				case OBTENERCENTROS:
 					obtenerCentros(salida);
 					break;
+				case OBTENERMATRICULACIONES:
+					obtenerMatricula(salida);
+					break;
 				}
 
 				salida.flush();
@@ -66,6 +69,17 @@ public class HiloServidor extends Thread {
 			e.printStackTrace();
 		}
 
+	}
+
+	private void obtenerMatricula(ObjectOutputStream salida) {
+			Matriculaciones matriculas = new Matriculaciones();
+			String matriculaAlumno = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]),session);
+			try {
+				salida.writeObject(matriculaAlumno);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
 	}
 
 	private void login(ObjectOutputStream salida) throws IOException {
