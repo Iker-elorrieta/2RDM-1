@@ -60,6 +60,9 @@ public class HiloServidor extends Thread {
 				case OBTENERMATRICULACIONES:
 					obtenerMatricula(salida);
 					break;
+				case MODIFICARREUNION:
+					aceptarReunion(salida);
+					break;
 				}
 
 				salida.flush();
@@ -72,14 +75,14 @@ public class HiloServidor extends Thread {
 	}
 
 	private void obtenerMatricula(ObjectOutputStream salida) {
-			Matriculaciones matriculas = new Matriculaciones();
-			String matriculaAlumno[] = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]),session);
-			try {
-				salida.writeObject(matriculaAlumno);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		
+		Matriculaciones matriculas = new Matriculaciones();
+		String matriculaAlumno[] = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]), session);
+		try {
+			salida.writeObject(matriculaAlumno);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private void login(ObjectOutputStream salida) throws IOException {
@@ -165,7 +168,7 @@ public class HiloServidor extends Thread {
 		List<Object[]> listaReuniones = new ArrayList<>();
 		for (Reuniones reunion : reuniones) {
 			listaReuniones.add(new Object[] { reunion.getAsunto(), reunion.getAula(), reunion.getEstado(),
-					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo() });
+					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion() });
 		}
 
 		salida.writeObject(listaReuniones);
@@ -181,6 +184,11 @@ public class HiloServidor extends Thread {
 		}
 
 		salida.writeObject(listaCentros);
+	}
+
+	private void aceptarReunion(ObjectOutputStream salida) throws IOException {
+		Reuniones r = new Reuniones();
+		r.modificarReunion(Integer.parseInt(datosRecibidos[1]), datosRecibidos[2].toString());
 	}
 
 }

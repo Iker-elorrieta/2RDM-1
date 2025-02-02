@@ -23,6 +23,7 @@ import java.util.Locale;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -54,8 +55,9 @@ public class Controlador implements ActionListener {
 			loginExclusivoProfes = "El uso de la aplicación es exclusivo de profesores",
 			loginExitoso = "Inicio de sesión exitoso.", loginBienvenida = " Bienvenid@ ",
 			loginError = "Error al iniciar sesión", horarioNoEncontrado = "No se han encontrado horarios para mostrar",
-			horarioError = "Error al cargar el horario";
-	private final int next = 1, previous = -1;
+			horarioError = "Error al cargar el horario",
+			reunionesNoEncontradas = "No se encontraron reuniones para mostrar.";
+	private final boolean next = true, aceptar = true;
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
@@ -147,6 +149,13 @@ public class Controlador implements ActionListener {
 		this.vistaReuniones.getBtnPreviousWeek().addActionListener(this);
 		this.vistaReuniones.getBtnPreviousWeek()
 				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_PREVIOUS_WEEK.toString());
+
+		this.vistaReuniones.getBtnAceptar().addActionListener(this);
+		this.vistaReuniones.getBtnAceptar().setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_ACEPTAR.toString());
+
+		this.vistaReuniones.getBtnRechazar().addActionListener(this);
+		this.vistaReuniones.getBtnRechazar()
+				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_RECHAZAR.toString());
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -171,23 +180,30 @@ public class Controlador implements ActionListener {
 			mCargarTodosUsuarios();
 			mCargarDatosOtrosHorarios();
 			break;
-		case PANEL_REUNIONES:
-			this.vistaPrincipal.getPanelReuniones().getLblFecha().setText(fechaSemanaActual + "");
-			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
-			mCargarReuniones();
-			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES);
-			break;
 		case CARGAR_TABLA_OTROS_HORARIOS:
 			this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios().setRowCount(0);
 			mCargarDatosOtrosHorarios();
+			break;
+		case PANEL_REUNIONES:
+			this.vistaPrincipal.getPanelReuniones().getLblFecha().setText(fechaSemanaActual + "");
+			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
+			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES);
+			mCargarReuniones();
 			break;
 		case PANEL_REUNIONES_NEXT_WEEK:
 			cambiarSemana(next);
 			break;
 		case PANEL_REUNIONES_PREVIOUS_WEEK:
-			cambiarSemana(previous);
+			cambiarSemana(!next);
 			break;
-
+		case PANEL_REUNIONES_ACEPTAR:
+			modificarReunion(aceptar);
+			mCargarReuniones();
+			break;
+		case PANEL_REUNIONES_RECHAZAR:
+			modificarReunion(!aceptar);
+			mCargarReuniones();
+			break;
 		default:
 			break;
 		}
@@ -442,6 +458,9 @@ public class Controlador implements ActionListener {
 			@SuppressWarnings("unchecked")
 			List<Object[]> reuniones = (List<Object[]>) eReuniones.readObject();
 
+			if (reuniones == null || reuniones.isEmpty())
+				JOptionPane.showMessageDialog(null, reunionesNoEncontradas, aviso, JOptionPane.WARNING_MESSAGE);
+
 			Map<Integer, String> mapaCentros = cargarCentros();
 
 			LocalDate fechaSemanaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
@@ -451,18 +470,21 @@ public class Controlador implements ActionListener {
 			String[][] data = new String[6][6];
 			Map<Point, Color> cellColors = new HashMap<>();
 
-			for (int h = 0; h < 6; h++) {
+			for (int h = 0; h < 6; h++)
 				data[h][0] = "Hora " + (h + 1);
-			}
 
 			for (Object[] reunionData : reuniones) {
-				int[] fecha = formatearFecha(reunionData[4].toString());
+				int[] fecha = formatearFecha(reunionData[3].toString());
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
+				// [0] = asunto / [1] = aula / [2] = estado / [3] = fecha / [4] = centro / [5] =
+				// titulo / [6] = ID
 				if (!localDate.isBefore(inicioSemana) && !localDate.isAfter(finSemana)) {
 					String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
-					String nombreCentro = mapaCentros.getOrDefault(reunionData[0], "Desconocido");
-					String reunionInfo = reunionData[5] + "\n" + nombreCentro + "\n Aula: " + reunionData[2];
+					String nombreCentro = mapaCentros.getOrDefault(Integer.parseInt(reunionData[4].toString()),
+							"Desconocido");
+					String reunionInfo = reunionData[5] + "\n" + nombreCentro + "\n Aula: " + reunionData[1] + "\n ID: "
+							+ reunionData[6];
 
 					int rowIndex = fecha[6] - 1;
 					int columnIndex = switch (dia.toLowerCase()) {
@@ -476,7 +498,7 @@ public class Controlador implements ActionListener {
 
 					if (columnIndex != -1) {
 						data[rowIndex][columnIndex] = reunionInfo;
-						switch (reunionData[3].toString().toLowerCase()) {
+						switch (reunionData[2].toString().toLowerCase()) {
 						case "pendiente":
 							cellColors.put(new Point(rowIndex, columnIndex), Color.YELLOW);
 							break;
@@ -578,12 +600,12 @@ public class Controlador implements ActionListener {
 	 * Avanza o retrocede una semana según lo que el usuario indique en el
 	 * panelReuniones para visualizar sus reuniones.
 	 * 
-	 * @param i
+	 * @param aceptar2
 	 */
-	private void cambiarSemana(int i) {
+	private void cambiarSemana(boolean aceptar) {
 		LocalDate fechaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
 
-		if (i > 0)
+		if (aceptar)
 			this.vistaReuniones.getLblFecha().setText(fechaActual.plusWeeks(1) + "");
 		else
 			this.vistaReuniones.getLblFecha().setText(fechaActual.minusWeeks(1) + "");
@@ -609,5 +631,51 @@ public class Controlador implements ActionListener {
 				return label;
 			}
 		});
+	}
+
+	private void modificarReunion(boolean aceptar) {
+		String estado, idReunion = "";
+		JTable tabla = this.vistaPrincipal.getPanelReuniones().getTablaReuniones();
+
+		int filaSeleccionada = tabla.getSelectedRow();
+		int columnaSeleccionada = tabla.getSelectedColumn();
+
+		if (filaSeleccionada != -1 && columnaSeleccionada != -1) {
+			Object valorCelda = tabla.getValueAt(filaSeleccionada, columnaSeleccionada);
+
+			if (valorCelda == null)
+				return;
+
+			if (valorCelda instanceof String) {
+				String contenido = (String) valorCelda;
+
+				int indexID = contenido.lastIndexOf("ID:");
+				if (indexID != -1)
+					idReunion = contenido.substring(indexID + 3).trim();
+
+			}
+		}
+
+		if (aceptar)
+			estado = "aceptada";
+		else
+			estado = "denegada";
+
+		try {
+			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
+
+			String[] datosReunion = { vista.Principal.enumAccionesHiloServidor.MODIFICARREUNION.name(), idReunion,
+					estado };
+
+			salida.writeObject(datosReunion);
+
+			// List<Object[]> reunionData = (List<Object[]>) entrada.readObject();
+
+		} catch (IOException e) {
+			System.out.println("Error al cargar usuarios: " + e.getMessage());
+			e.printStackTrace();
+		}
+
 	}
 }
