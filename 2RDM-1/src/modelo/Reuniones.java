@@ -129,30 +129,51 @@ public class Reuniones implements java.io.Serializable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Reuniones> getReunionesById(int i, Session session) {
+	public List<Reuniones> getReunionesById(int i) {
+		SessionFactory sesion = HibernateUtil.getSessionFactory();
+		Session session = sesion.openSession();
 		String hql = "FROM Reuniones WHERE usersByProfesorId.id=" + i;
 		Query query = session.createQuery(hql);
 
 		List<Reuniones> reuniones = query.list();
 
+		session.close();
 		return reuniones;
+
 	}
 
-	public void modificarReunion(int id, String estado) {
+	public boolean modificarReunion(int id, String estado) {
 		Transaction tx = null;
 		SessionFactory sesion = HibernateUtil.getSessionFactory();
 		Session session = sesion.openSession();
-		tx = session.beginTransaction();
+		boolean exito = false;
 
-		String hql = "from Reuniones WHERE idReunion =" + id;
-		Query q = session.createQuery(hql);
+		try {
+			tx = session.beginTransaction();
 
-		Reuniones reunion = (Reuniones) q.uniqueResult();
+			String hql = "FROM Reuniones WHERE idReunion = :id";
+			Query q = session.createQuery(hql);
+			q.setParameter("id", id);
 
-		reunion.setEstado(estado);
+			Reuniones reunion = (Reuniones) q.uniqueResult();
 
-		session.update(reunion);
-		tx.commit();
+			if (reunion != null) {
+				reunion.setEstado(estado);
+				session.update(reunion);
+				tx.commit();
+				exito = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (tx != null)
+				tx.rollback();
+
+		} finally {
+			session.close();
+		}
+
+		return exito;
 	}
 
 }

@@ -163,7 +163,7 @@ public class HiloServidor extends Thread {
 	private void reunion(ObjectOutputStream salida) throws IOException {
 		Reuniones r = new Reuniones();
 		List<Reuniones> reuniones = new ArrayList<>();
-		reuniones = r.getReunionesById(Integer.parseInt(datosRecibidos[1]), session);
+		reuniones = r.getReunionesById(Integer.parseInt(datosRecibidos[1]));
 
 		List<Object[]> listaReuniones = new ArrayList<>();
 		for (Reuniones reunion : reuniones) {
@@ -188,7 +188,10 @@ public class HiloServidor extends Thread {
 
 	private void aceptarReunion(ObjectOutputStream salida) throws IOException {
 		Reuniones r = new Reuniones();
-		r.modificarReunion(Integer.parseInt(datosRecibidos[1]), datosRecibidos[2].toString());
+		boolean resultado = r.modificarReunion(Integer.parseInt(datosRecibidos[1]), datosRecibidos[2].toString());
+
+		salida.writeObject(resultado);
+
 	}
 
 }

@@ -23,7 +23,6 @@ import java.util.Locale;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -48,7 +47,7 @@ public class Controlador implements ActionListener {
 			.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
 	private int usuarioNoAdmitidoId = 4;
 
-	private final static String error = "Error", aviso = "Aviso";
+	private final static String error = "Error", aviso = "Aviso", info = "Información";
 	private final static String lunes = "L/A", martes = "M/A", miercoles = "X", jueves = "J/O", viernes = "V/O";
 	private final static String loginRelleneCampos = "Por favor, rellene todos los campos.",
 			loginIncorrecto = "Usuario o contraseña incorrectos",
@@ -198,11 +197,9 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_REUNIONES_ACEPTAR:
 			modificarReunion(aceptar);
-			mCargarReuniones();
 			break;
 		case PANEL_REUNIONES_RECHAZAR:
 			modificarReunion(!aceptar);
-			mCargarReuniones();
 			break;
 		default:
 			break;
@@ -652,30 +649,40 @@ public class Controlador implements ActionListener {
 				int indexID = contenido.lastIndexOf("ID:");
 				if (indexID != -1)
 					idReunion = contenido.substring(indexID + 3).trim();
-
 			}
+
+			if (aceptar)
+				estado = "aceptada";
+			else
+				estado = "denegada";
+
+			try {
+				ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
+				ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
+
+				String[] datosReunion = { vista.Principal.enumAccionesHiloServidor.MODIFICARREUNION.name(), idReunion,
+						estado };
+
+				salida.writeObject(datosReunion);
+
+				boolean resultado = (boolean) entrada.readObject();
+
+				if (resultado)
+					JOptionPane.showMessageDialog(null, "La reunión se modificó correctamente.", info,
+							JOptionPane.INFORMATION_MESSAGE);
+				else
+					JOptionPane.showMessageDialog(null, "Error: No se pudo modificar la reunión.", error,
+							JOptionPane.ERROR_MESSAGE);
+
+				mCargarReuniones();
+
+			} catch (IOException | ClassNotFoundException e) {
+				System.out.println("Error al cargar reuniones: " + e.getMessage());
+				e.printStackTrace();
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "Por favor, selecciona una reunión.", aviso,
+					JOptionPane.WARNING_MESSAGE);
 		}
-
-		if (aceptar)
-			estado = "aceptada";
-		else
-			estado = "denegada";
-
-		try {
-			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
-
-			String[] datosReunion = { vista.Principal.enumAccionesHiloServidor.MODIFICARREUNION.name(), idReunion,
-					estado };
-
-			salida.writeObject(datosReunion);
-
-			// List<Object[]> reunionData = (List<Object[]>) entrada.readObject();
-
-		} catch (IOException e) {
-			System.out.println("Error al cargar usuarios: " + e.getMessage());
-			e.printStackTrace();
-		}
-
 	}
 }
