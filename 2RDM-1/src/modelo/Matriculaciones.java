@@ -48,16 +48,12 @@ public class Matriculaciones implements java.io.Serializable {
 		this.users = users;
 	}
 
-	public String recogerMatriculaPorId(int idA, Session session) {
+	public String[] recogerMatriculaPorId(int idA, Session session) {
 		String hql = "FROM Matriculaciones WHERE id.alumId="+idA;
 	    Query q = session.createQuery(hql);
 	    Matriculaciones matriculacion = (Matriculaciones) q.uniqueResult();
 	    
-	    String datosMatricula = String.join(", ",
-	    		matriculacion.getCiclos().getNombre(),
-	    		Integer.toString(matriculacion.getId().getCurso())
-	        );
-	    
+	    String datosMatricula[] = {matriculacion.getCiclos().getNombre(),Integer.toString(matriculacion.getId().getCurso())};
 	    
 		return datosMatricula;
 		

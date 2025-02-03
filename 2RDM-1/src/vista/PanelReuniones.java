@@ -15,11 +15,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
 
 public class PanelReuniones extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private JButton btnVolver, btnNextWeek, btnPreviousWeek, btnAceptar, btnRechazar;
+	private JButton btnVolver, btnNextWeek, btnPreviousWeek, btnRechazar, btnAceptar;
 	private DefaultTableModel modeloReuniones;
 	private JTable tablaReuniones;
 	private JLabel lblFecha;
@@ -76,19 +75,19 @@ public class PanelReuniones extends JPanel {
 		btnPreviousWeek.setBackground(new Color(100, 100, 100));
 		add(btnPreviousWeek);
 
-		btnAceptar = new JButton("Aceptar");
-		btnAceptar.setForeground(Color.WHITE);
-		btnAceptar.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnAceptar.setBackground(UIManager.getColor("windowBorder"));
-		btnAceptar.setBounds(876, 593, 145, 37);
-		add(btnAceptar);
-
 		btnRechazar = new JButton("Rechazar");
 		btnRechazar.setForeground(Color.WHITE);
 		btnRechazar.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnRechazar.setBackground(UIManager.getColor("windowBorder"));
-		btnRechazar.setBounds(706, 593, 145, 37);
+		btnRechazar.setBackground(new Color(100, 100, 100));
+		btnRechazar.setBounds(685, 593, 145, 37);
 		add(btnRechazar);
+
+		btnAceptar = new JButton("Aceptar");
+		btnAceptar.setForeground(Color.WHITE);
+		btnAceptar.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnAceptar.setBackground(new Color(100, 100, 100));
+		btnAceptar.setBounds(876, 593, 145, 37);
+		add(btnAceptar);
 
 	}
 
@@ -108,6 +107,22 @@ public class PanelReuniones extends JPanel {
 		return btnPreviousWeek;
 	}
 
+	public JButton getBtnRechazar() {
+		return btnRechazar;
+	}
+
+	public void setBtnRechazar(JButton btnRechazar) {
+		this.btnRechazar = btnRechazar;
+	}
+
+	public JButton getBtnAceptar() {
+		return btnAceptar;
+	}
+
+	public void setBtnAceptar(JButton btnAceptar) {
+		this.btnAceptar = btnAceptar;
+	}
+
 	public JLabel getLblFecha() {
 		return lblFecha;
 	}
@@ -123,5 +138,4 @@ public class PanelReuniones extends JPanel {
 	public void setCellColors(Map<Point, Color> cellColors) {
 		this.cellColors = cellColors;
 	}
-
 }
