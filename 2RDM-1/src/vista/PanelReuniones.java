@@ -42,7 +42,7 @@ public class PanelReuniones extends JPanel {
 		tablaReuniones.setRowSelectionAllowed(false);
 		tablaReuniones.setCellSelectionEnabled(false);
 		tablaReuniones.setRowHeight(80);
-		tablaReuniones.getColumnModel().getColumn(0).setMaxWidth(70);
+		tablaReuniones.getColumnModel().getColumn(0).setMaxWidth(50);
 		tablaReuniones.setDefaultEditor(Object.class, null);
 
 		scrollPane.setViewportView(tablaReuniones);
