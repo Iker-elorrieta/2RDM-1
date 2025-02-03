@@ -41,19 +41,15 @@ public class HiloServidor extends Thread {
 				case LOGIN:
 					login(salida);
 					break;
-
 				case HORARIO:
 					horario(salida);
 					break;
-
 				case TODOSUSUARIOS:
 					todosUsuarios(salida);
 					break;
-
 				case REUNIONES:
 					reunion(salida);
 					break;
-
 				case OBTENERCENTROS:
 					obtenerCentros(salida);
 					break;
