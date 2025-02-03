@@ -63,6 +63,9 @@ public class HiloServidor extends Thread {
 				case MODIFICARREUNION:
 					aceptarReunion(salida);
 					break;
+				case GUARDARIMAGEN:
+					guardarImagen();
+					break;
 				}
 
 				salida.flush();
@@ -72,6 +75,15 @@ public class HiloServidor extends Thread {
 			System.out.println("Cliente " + cliente.getInetAddress() + " desconectado (" + e.getMessage() + ")");
 		}
 
+	}
+	
+	private void guardarImagen() {
+		Users usuarioImagen = new Users();
+		usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
+		usuarioImagen.setArgazkia(new byte[Integer.parseInt(datosRecibidos[2])]);
+		usuarioImagen.guardarImagen(session);
+		System.out.println("GUARDADO");
+		
 	}
 
 	private void obtenerMatricula(ObjectOutputStream salida) {
