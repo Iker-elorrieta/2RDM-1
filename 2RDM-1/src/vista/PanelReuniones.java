@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
 
 public class PanelReuniones extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private JButton btnVolver, btnNextWeek, btnPreviousWeek, btnRechazar, btnAceptar;
+	private JButton btnVolver, btnNextWeek, btnPreviousWeek, btnPendientes;
 	private DefaultTableModel modeloReuniones;
 	private JTable tablaReuniones;
 	private JLabel lblFecha;
@@ -75,19 +75,13 @@ public class PanelReuniones extends JPanel {
 		btnPreviousWeek.setBackground(new Color(100, 100, 100));
 		add(btnPreviousWeek);
 
-		btnRechazar = new JButton("Rechazar");
-		btnRechazar.setForeground(Color.WHITE);
-		btnRechazar.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnRechazar.setBackground(new Color(100, 100, 100));
-		btnRechazar.setBounds(685, 593, 145, 37);
-		add(btnRechazar);
-
-		btnAceptar = new JButton("Aceptar");
-		btnAceptar.setForeground(Color.WHITE);
-		btnAceptar.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnAceptar.setBackground(new Color(100, 100, 100));
-		btnAceptar.setBounds(876, 593, 145, 37);
-		add(btnAceptar);
+		btnPendientes = new JButton("Ver reuniones pendientes");
+		btnPendientes.setForeground(Color.WHITE);
+		btnPendientes.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnPendientes.setBorder(new LineBorder(new Color(255, 255, 255), 2));
+		btnPendientes.setBackground(new Color(100, 100, 100));
+		btnPendientes.setBounds(793, 593, 228, 37);
+		add(btnPendientes);
 
 	}
 
@@ -107,22 +101,6 @@ public class PanelReuniones extends JPanel {
 		return btnPreviousWeek;
 	}
 
-	public JButton getBtnRechazar() {
-		return btnRechazar;
-	}
-
-	public void setBtnRechazar(JButton btnRechazar) {
-		this.btnRechazar = btnRechazar;
-	}
-
-	public JButton getBtnAceptar() {
-		return btnAceptar;
-	}
-
-	public void setBtnAceptar(JButton btnAceptar) {
-		this.btnAceptar = btnAceptar;
-	}
-
 	public JLabel getLblFecha() {
 		return lblFecha;
 	}
@@ -138,4 +116,9 @@ public class PanelReuniones extends JPanel {
 	public void setCellColors(Map<Point, Color> cellColors) {
 		this.cellColors = cellColors;
 	}
+
+	public JButton getBtnPendientes() {
+		return btnPendientes;
+	}
+
 }

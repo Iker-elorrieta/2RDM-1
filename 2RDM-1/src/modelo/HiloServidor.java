@@ -76,14 +76,14 @@ public class HiloServidor extends Thread {
 		}
 
 	}
-	
+
 	private void guardarImagen() {
 		Users usuarioImagen = new Users();
 		usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
 		usuarioImagen.setArgazkia(new byte[Integer.parseInt(datosRecibidos[2])]);
 		usuarioImagen.guardarImagen(session);
 		System.out.println("GUARDADO");
-		
+
 	}
 
 	private void obtenerMatricula(ObjectOutputStream salida) {
@@ -141,15 +141,13 @@ public class HiloServidor extends Thread {
 				usuario.getTelefono2() != null ? Integer.toString(usuario.getTelefono2()) : "0", // [7] --> Tlf2
 				usuario.getApellidos(), // [8] --> apellido
 				usuario.getUsername(), // [9] --> username
-				usuario.getArgazkia() != null ? usuario.getArgazkia().toString() : "0" //[10]
-				
+				usuario.getArgazkia() != null ? usuario.getArgazkia().toString() : "0" // [10]
 
 		};
 
 		salida.writeObject(datosUsuario);
 
 	}
-
 
 	private void horario(ObjectOutputStream salida) throws IOException {
 		Horarios h = new Horarios();
