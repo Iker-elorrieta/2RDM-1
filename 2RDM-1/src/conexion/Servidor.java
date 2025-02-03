@@ -26,7 +26,7 @@ public class Servidor {
 
 			}
 			System.out.println("Cliente desconectado.");
-
+				
 			socket.close();
 			serverSocket.close();
 		} catch (IOException e) {
