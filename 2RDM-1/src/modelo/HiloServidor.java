@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -73,14 +73,28 @@ public class HiloServidor extends Thread {
 
 	}
 
-	private void guardarImagen() {
-		Users usuarioImagen = new Users();
-		usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
-		usuarioImagen.setArgazkia(new byte[Integer.parseInt(datosRecibidos[2])]);
-		usuarioImagen.guardarImagen(session);
-		System.out.println("GUARDADO");
 
+	private void guardarImagen() {
+	    // Recibimos la cadena Base64 de la imagen
+	    String imagenBase64 = datosRecibidos[2]; // Aquí recibimos la cadena Base64
+
+	 // Decodificar la cadena Base64 a un arreglo de bytes
+	    byte[] imagenBytes = Base64.getDecoder().decode(imagenBase64); // Usamos getDecoder() y decode() de java.util.Base64
+
+
+	    Users usuarioImagen = new Users();
+	    usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
+	    usuarioImagen.setArgazkia(imagenBytes); // Asignamos los bytes a la propiedad de imagen
+
+	    // Guardar la imagen en la base de datos
+	    usuarioImagen.guardarImagen(session);
+	    System.out.println("Imagen guardada correctamente.");
 	}
+
+
+
+	
+	
 
 	private void obtenerMatricula(ObjectOutputStream salida) {
 		Matriculaciones matriculas = new Matriculaciones();
@@ -94,7 +108,7 @@ public class HiloServidor extends Thread {
 	}
 
 	private void login(ObjectOutputStream salida) throws IOException {
-
+		
 		Users usuario = new Users();
 		usuario.setUsername(datosRecibidos[1]);
 		usuario.setPassword(datosRecibidos[2]);
@@ -175,7 +189,7 @@ public class HiloServidor extends Thread {
 		List<Object[]> listaReuniones = new ArrayList<>();
 		for (Reuniones reunion : reuniones) {
 			listaReuniones.add(new Object[] { reunion.getAsunto(), reunion.getAula(), reunion.getEstado(),
-					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion() });
+					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion()});
 		}
 
 		salida.writeObject(listaReuniones);
