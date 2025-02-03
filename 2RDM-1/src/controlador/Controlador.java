@@ -723,7 +723,7 @@ public class Controlador implements ActionListener {
 			return;
 		}
 
-		try {
+		try { 
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
