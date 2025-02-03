@@ -496,19 +496,11 @@ public class Controlador implements ActionListener {
 					if (columnIndex != -1) {
 						data[rowIndex][columnIndex] = reunionInfo;
 						switch (reunionData[2].toString().toLowerCase()) {
-						case "pendiente":
-							cellColors.put(new Point(rowIndex, columnIndex), Color.YELLOW);
-							break;
-						case "aceptada":
-							cellColors.put(new Point(rowIndex, columnIndex), Color.GREEN);
-							break;
-						case "denegada":
-							cellColors.put(new Point(rowIndex, columnIndex), Color.RED);
-							break;
-						case "conflicto":
-							cellColors.put(new Point(rowIndex, columnIndex), Color.GRAY);
-							break;
-
+						case "pendiente" -> cellColors.put(new Point(rowIndex, columnIndex), Color.YELLOW);
+						case "aceptada" -> cellColors.put(new Point(rowIndex, columnIndex), Color.GREEN);
+						case "denegada" -> cellColors.put(new Point(rowIndex, columnIndex), Color.RED);
+						case "conflicto" -> cellColors.put(new Point(rowIndex, columnIndex), Color.GRAY);
+						default -> cellColors.put(new Point(rowIndex, columnIndex), Color.WHITE);
 						}
 					}
 				}
