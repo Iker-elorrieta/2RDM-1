@@ -127,7 +127,7 @@ public class HiloServidor extends Thread {
 			tiposCero.setId(-1);
 			usuario.setTipos(tiposCero);
 
-			// TODO falta usuario.setArgazkia(null);
+			usuario.setArgazkia(new byte[0]);
 
 		}
 
@@ -140,15 +140,16 @@ public class HiloServidor extends Thread {
 				usuario.getTelefono1() != null ? Integer.toString(usuario.getTelefono1()) : "0", // [6] --> Tlf1
 				usuario.getTelefono2() != null ? Integer.toString(usuario.getTelefono2()) : "0", // [7] --> Tlf2
 				usuario.getApellidos(), // [8] --> apellido
-				usuario.getUsername() // [9] --> username
-
-				// TODO falta usuario.getArgazkia(URL);
+				usuario.getUsername(), // [9] --> username
+				usuario.getArgazkia() != null ? usuario.getArgazkia().toString() : "0" //[10]
+				
 
 		};
 
 		salida.writeObject(datosUsuario);
 
 	}
+
 
 	private void horario(ObjectOutputStream salida) throws IOException {
 		Horarios h = new Horarios();
