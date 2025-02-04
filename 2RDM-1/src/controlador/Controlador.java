@@ -54,16 +54,26 @@ public class Controlador implements ActionListener {
 			.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
 	private int usuarioNoAdmitidoId = 4;
 
+	private String ip = "localhost";
 	private final static String error = "Error", aviso = "Aviso", info = "Información";
 	private final static String lunes = "L/A", martes = "M/A", miercoles = "X", jueves = "J/O", viernes = "V/O";
+	private final static String lunesFull = "lunes", martesFull = "martes", miercolesFull = "miércoles",
+			juevesFull = "jueves", viernesFull = "viernes";
 	private final static String a = "aceptada", d = "denegada", p = "pendiente", c = "conflicto";
+	private final static String btn = "btn";
+	private final static String conectado = "Conectado al servidor.";
 	private final static String loginRelleneCampos = "Por favor, rellene todos los campos.",
 			loginIncorrecto = "Usuario o contraseña incorrectos",
 			loginExclusivoProfes = "El uso de la aplicación es exclusivo de profesores",
 			loginExitoso = "Inicio de sesión exitoso.", loginBienvenida = " Bienvenid@ ",
 			loginError = "Error al iniciar sesión", horarioNoEncontrado = "No se han encontrado horarios para mostrar",
 			horarioError = "Error al cargar el horario",
-			reunionesNoEncontradas = "No se encontraron reuniones para mostrar.";
+			reunionesNoEncontradas = "No se encontraron reuniones para mostrar.",
+			reunionesEstadoConflicto = "Se le ha establecido el estado de" + c + "' a la reunión ID: ",
+			reunionPorFavorSelecciona = "Por favor, selecciona una reunión.",
+			reunionNoSePudoObtenerId = "No se pudo obtener el ID de la reunión.",
+			reunionErrorAlModificar = "Error al modificar reunión: ", reunionId = "La reunión ID: ",
+			reunionModificoCorrectamente = " se modificó correctamente.";
 	private final boolean next = true;
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
@@ -83,16 +93,14 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que hace la conexion con el Servidor
+	 * Método que hace la conexion con el Servidor
 	 */
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
-		// String ip = "10.5.13.47";
-		String ip = "192.168.1.152";
 
 		try {
 			socket = new Socket(ip, puerto);
-			System.out.println("Conectado al servidor.");
+			System.out.println(conectado);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -218,10 +226,10 @@ public class Controlador implements ActionListener {
 			cambiarSemana(!next);
 			break;
 		case PANEL_REUNIONES_ACEPTAR:
-			modificarReunion(a, "btn");
+			modificarReunion(a, btn);
 			break;
 		case PANEL_REUNIONES_RECHAZAR:
-			modificarReunion(d, "btn");
+			modificarReunion(d, btn);
 			break;
 		case PANEL_REUNIONES_PENDIENTES:
 			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES_PENDIENTES);
@@ -260,15 +268,15 @@ public class Controlador implements ActionListener {
 			String[] datosUsuario = (String[]) entradaLogin.readObject();
 
 			if (datosUsuario == null || datosUsuario[0].equals("-1")) {
-				// Login incorrecto
+				// Login incorrecto, si usuario y/o contraseña incorrectos, muestra aviso
 				JOptionPane.showMessageDialog(null, loginIncorrecto, error, JOptionPane.ERROR_MESSAGE);
 
 			} else if (Integer.parseInt(datosUsuario[1]) == usuarioNoAdmitidoId) {
-				// Login correcto - Tipo usuario NO admitido
+				// Login correcto - Tipo usuario NO admitido, solo pueden logearse profesores
 				JOptionPane.showMessageDialog(null, loginExclusivoProfes, error, JOptionPane.ERROR_MESSAGE);
 
 			} else {
-				// Login correcto - Tipo usuario admitido
+				// Login correcto - Tipo usuario admitido, se logea correctamente
 				idUsuarioLogeado = Integer.parseInt(datosUsuario[0]);
 
 				JOptionPane.showMessageDialog(null, loginBienvenida + datosUsuario[2], loginExitoso,
@@ -324,6 +332,76 @@ public class Controlador implements ActionListener {
 	 */
 	public void cargarHorarioProfe() {
 		cargarTablaHorario(idUsuarioLogeado, this.vistaPrincipal.getPanelHorario().getModeloHorario());
+
+		/**
+		 * EN EL PANEL HORARIOS HAY UN RENDER QUE SE ENCARGA DE ADAPTAR EL TEXTO A LA
+		 * CELDA
+		 */
+	}
+
+	/**
+	 * Metodo que recoge del Servidor una Lista de todos los usuarios, se cargan los
+	 * nombres de los diferentes profesores
+	 */
+	@SuppressWarnings("unchecked")
+	private void mCargarTodosUsuarios() {
+		try {
+			ObjectOutputStream salidaUsuarios = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entradaUsuarios = new ObjectInputStream(socket.getInputStream());
+
+			String[] datosTodosUsuarios = { vista.Principal.enumAccionesHiloServidor.TODOSUSUARIOS.name() };
+			salidaUsuarios.writeObject(datosTodosUsuarios);
+
+			// Se recibe la lista de usuarios como una lista de arrays de objetos.
+			List<Object[]> usuariosData = (List<Object[]>) entradaUsuarios.readObject();
+
+			// Si la lista está vacía o es nula, se muestra un mensaje y se detiene el
+			// proceso.
+			if (usuariosData == null || usuariosData.isEmpty()) {
+				System.out.println("No se recibieron usuarios.");
+				return;
+			}
+
+			// Se crea una lista para almacenar los objetos de tipo Users.
+			List<Users> usuarios = new ArrayList<>();
+
+			// Se recorre la lista recibida y se transforman los datos en objetos Users.
+			for (Object[] usuarioData : usuariosData) {
+				Users us = new Users();
+				us.setId((Integer) usuarioData[0]); // ID del usuario
+				us.setUsername((String) usuarioData[1]); // Nombre de usuario
+				us.setNombre((String) usuarioData[2]); // Nombre real
+				us.setEmail((String) usuarioData[3]); // Email
+
+				// Se crea un objeto Tipos y se le asigna su ID.
+				Tipos tipo = new Tipos();
+				tipo.setId((Integer) usuarioData[4]);
+				us.setTipos(tipo); // Se asigna el tipo de usuario.
+
+				us.setPassword((String) usuarioData[5]); // Contraseña
+				us.setApellidos((String) usuarioData[6]); // Apellidos
+				us.setDni((String) usuarioData[7]); // DNI
+				us.setDireccion((String) usuarioData[8]); // Dirección
+				us.setTelefono1((Integer) usuarioData[9]); // Teléfono 1
+				us.setTelefono2((Integer) usuarioData[10]);// Teléfono 2
+
+				// Se agrega el usuario a la lista de usuarios.
+				usuarios.add(us);
+			}
+
+			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0) {
+				// Se recorre la lista de usuarios y se añaden al ComboBox, excepto los de un
+				// tipo específico.
+				for (Users us : usuarios) {
+					if (us.getTipos().getId() != usuarioNoAdmitidoId) {
+						this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
+					}
+				}
+			}
+
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -331,13 +409,18 @@ public class Controlador implements ActionListener {
 	 * Otros Horarios y mostrarlos en una tabla.
 	 */
 	private void mCargarDatosOtrosHorarios() {
-		// Se obtiene el usuario seleccionado del combo box
+		// Se obtiene el usuario seleccionado del combo box, se muestra el horario del
+		// profesor elegido
 		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
 				.getSelectedItem();
 
 		cargarTablaHorario(usuarioElegido.getId(),
 				this.vistaPrincipal.getPanelOtrosHorarios().getModeloOtrosHorarios());
 
+		/**
+		 * EN EL PANEL OTROS HORARIOS HAY UN RENDER QUE SE ENCARGA DE ADAPTAR EL TEXTO A
+		 * LA CELDA
+		 */
 	}
 
 	/**
@@ -405,61 +488,6 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que recoge del Servidor una Lista de todos los usuarios
-	 */
-	@SuppressWarnings("unchecked")
-	private void mCargarTodosUsuarios() {
-		try {
-			ObjectOutputStream salidaUsuarios = new ObjectOutputStream(socket.getOutputStream());
-			ObjectInputStream entradaUsuarios = new ObjectInputStream(socket.getInputStream());
-
-			String[] datosTodosUsuarios = { vista.Principal.enumAccionesHiloServidor.TODOSUSUARIOS.name() };
-			salidaUsuarios.writeObject(datosTodosUsuarios);
-
-			List<Object[]> usuariosData = (List<Object[]>) entradaUsuarios.readObject();
-
-			if (usuariosData == null || usuariosData.isEmpty()) {
-				System.out.println("No se recibieron usuarios.");
-				return;
-			}
-
-			List<Users> usuarios = new ArrayList<>();
-			for (Object[] usuarioData : usuariosData) {
-				Users us = new Users();
-				us.setId((Integer) usuarioData[0]);
-				us.setUsername((String) usuarioData[1]);
-				us.setNombre((String) usuarioData[2]);
-				us.setEmail((String) usuarioData[3]);
-
-				Tipos tipo = new Tipos();
-				tipo.setId((Integer) usuarioData[4]);
-				us.setTipos(tipo);
-
-				us.setPassword((String) usuarioData[5]);
-				us.setApellidos((String) usuarioData[6]);
-				us.setDni((String) usuarioData[7]);
-				us.setDireccion((String) usuarioData[8]);
-				us.setTelefono1((Integer) usuarioData[9]);
-				us.setTelefono2((Integer) usuarioData[10]);
-
-				usuarios.add(us);
-			}
-
-			if (this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().getItemCount() == 0) {
-				for (Users us : usuarios) {
-					if (us.getTipos().getId() != usuarioNoAdmitidoId) {
-						this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox().addItem(us);
-					}
-				}
-			}
-
-		} catch (IOException | ClassNotFoundException e) {
-			System.out.println("Error al cargar usuarios: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Carga la tabla de reuniones la cual está formada por el Horario y las
 	 * Reuniones del profesor que esté usando la aplicación.
 	 */
@@ -471,6 +499,7 @@ public class Controlador implements ActionListener {
 			ObjectOutputStream sReuniones = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream eReuniones = new ObjectInputStream(socket.getInputStream());
 
+			// Carga las reuniones del profesor logeado
 			String[] datosReuniones = { vista.Principal.enumAccionesHiloServidor.REUNIONES.name(),
 					String.valueOf(idUsuarioLogeado) };
 
@@ -488,15 +517,31 @@ public class Controlador implements ActionListener {
 
 				actionPerformed(e);
 			}
-
+			// Se leen los centros a través JSON, se carga un mapa de centros con IDs y
+			// nombres
 			Map<Integer, String> mapaCentros = cargarCentros();
+
+			// Se obtiene la fecha de la semana actual desde el label
 			LocalDate fechaSemanaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
+
+			// Se determina el inicio y fin de la semana actual.
 			LocalDate inicioSemana = fechaSemanaActual.with(DayOfWeek.MONDAY);
 			LocalDate finSemana = fechaSemanaActual.with(DayOfWeek.SUNDAY);
 
+			// Array bidimensional de Strings para almacenar reuniones aceptadas.
 			String[][] dataAceptadas = new String[6][6];
+
+			// Lista para almacenar reuniones pendientes, representadas como arrays de
+			// Strings.
 			List<String[]> dataPendientes = new ArrayList<>();
+
+			// Se declara un mapa para almacenar los colores de las celdas de reuniones
+			// aceptadas.
+			// La clave es un objeto Point (para referenciar rowIndex y columnIndex).
+			// El valor es un Color para representar visualmente el estado de la reunión.
 			Map<Point, Color> cellColorsAceptadas = new HashMap<>();
+
+			// Se declara otro mapa similar, pero para las reuniones pendientes.
 			Map<Point, Color> cellColorsPendientes = new HashMap<>();
 
 			int rowPendiente = 0;
@@ -505,21 +550,31 @@ public class Controlador implements ActionListener {
 				dataAceptadas[h][0] = "Hora " + (h + 1);
 
 			for (Object[] reunionData : reuniones) {
+				// Convierte la fecha en un array con [año, mes,día].
 				int[] fecha = formatearFecha(reunionData[3].toString());
+
+				// Se crea un objeto LocalDate con los valores obtenidos (año, mes y día).
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
+				// Se obtiene el nombre completo del día de la semana en español.
 				String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
+
+				// Se obtiene el nombre del centro mapaCentros.getOrDefault(...) busca el
+				// centro en mapaCentros usando el ID almacenado en reunionData[4].
+				// Si no lo encuentra, devuelve "Desconocido".
 				String nombreCentro = mapaCentros.getOrDefault(Integer.parseInt(reunionData[4].toString()),
 						"Desconocido");
+
+				// Se construye una cadena con la información de la reunión.
 				String reunionInfo = reunionData[5] + "\n" + nombreCentro + "\n Aula: " + reunionData[1];
 
 				int rowIndex = fecha[6] - 1;
 				int columnIndex = switch (dia.toLowerCase()) {
-				case "lunes" -> 1;
-				case "martes" -> 2;
-				case "miércoles" -> 3;
-				case "jueves" -> 4;
-				case "viernes" -> 5;
+				case lunesFull -> 1;
+				case martesFull -> 2;
+				case miercolesFull -> 3;
+				case juevesFull -> 4;
+				case viernesFull -> 5;
 				default -> -1;
 				};
 
@@ -530,18 +585,20 @@ public class Controlador implements ActionListener {
 							Object a = this.vistaPrincipal.getPanelReuniones().getModeloReuniones().getValueAt(rowIndex,
 									columnIndex);
 
+							// Si 'a' no es nulo, significa que en esa celda hay contenido, por lo que se
+							// entiende que ese día a esa hora el profesor está ocupado (tiene clase).
+							// Por lo tanto, se llama al método modificar reunión enviándole el id de la
+							// misma y el estado de conflicto
 							if (a != null) {
-								System.out.println("entra");
+								// Se actualizan las reuniones mostradas
 								modificarReunion(c, reunionData[6].toString());
 
 								JOptionPane.showMessageDialog(null,
-										"Se le ha establecido el estado de '" + c + "' a la reunión ID: "
-												+ reunionData[6] + " (" + reunionData[5] + ")",
-										aviso, JOptionPane.WARNING_MESSAGE);
+										reunionesEstadoConflicto + reunionData[6] + " (" + reunionData[5] + ")", aviso,
+										JOptionPane.WARNING_MESSAGE);
 								mCargarReuniones();
 								return;
 							} else {
-								System.out.println("no entra");
 								this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setValueAt(reunionInfo,
 										rowIndex, columnIndex);
 								cellColorsAceptadas.put(new Point(rowIndex, columnIndex), Color.GREEN);
@@ -550,6 +607,9 @@ public class Controlador implements ActionListener {
 						break;
 					case d:
 						break;
+					// Los siguientes cases se encargan de guardar las reuniones
+					// pendientes/en conflicto para posteriormente cargarlas en la tabla de
+					// reuniones pendientes
 					case p:
 					case c:
 						String[] reunionPendiente = new String[6];
@@ -679,6 +739,14 @@ public class Controlador implements ActionListener {
 		mCargarReuniones();
 	}
 
+	/**
+	 * Se encarga de aplicar todos los colores de las tablas y de adaptar el texto
+	 * al espacio de la celda.
+	 * 
+	 * @param cellColors
+	 * @param reuniones
+	 * @param tabla
+	 */
 	private void renderTable(Map<Point, Color> cellColors, boolean reuniones, JTable tabla) {
 		tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
@@ -699,6 +767,14 @@ public class Controlador implements ActionListener {
 		});
 	}
 
+	/**
+	 * Modifica la reunión que se le envía por parámetro (o la que selecciona el
+	 * usuario cuando se le manda "btn" al método) al estado que también se le envía
+	 * por parámetro.
+	 * 
+	 * @param estado
+	 * @param id
+	 */
 	private void modificarReunion(String estado, String id) {
 		String idReunion = String.valueOf(id);
 
@@ -711,19 +787,17 @@ public class Controlador implements ActionListener {
 			if (filaSeleccionada != -1) {
 				idReunion = tabla.getValueAt(filaSeleccionada, 0).toString().trim(); // Columna "ID"
 			} else {
-				JOptionPane.showMessageDialog(null, "Por favor, selecciona una reunión.", aviso,
-						JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null, reunionPorFavorSelecciona, aviso, JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 		}
 
 		if (idReunion.isEmpty()) {
-			JOptionPane.showMessageDialog(null, "No se pudo obtener el ID de la reunión.", aviso,
-					JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, reunionNoSePudoObtenerId, aviso, JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
-		try { 
+		try {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
@@ -735,18 +809,17 @@ public class Controlador implements ActionListener {
 			boolean resultado = (boolean) entrada.readObject();
 
 			if (resultado) {
-				if (id.equalsIgnoreCase("btn")) {
-					JOptionPane.showMessageDialog(null, "La reunión ID: " + idReunion + " se modificó correctamente.",
-							info, JOptionPane.INFORMATION_MESSAGE);
+				if (id.equalsIgnoreCase(btn)) {
+					JOptionPane.showMessageDialog(null, reunionId + idReunion + reunionModificoCorrectamente, info,
+							JOptionPane.INFORMATION_MESSAGE);
 				}
 			} else {
-				JOptionPane.showMessageDialog(null, "Error: No se pudo modificar la reunión.", error,
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, reunionErrorAlModificar, error, JOptionPane.ERROR_MESSAGE);
 			}
 			mCargarReuniones();
 
 		} catch (IOException | ClassNotFoundException e) {
-			System.err.println("Error al modificar reunión: " + e.getMessage());
+			System.err.println(reunionErrorAlModificar + e.getMessage());
 			e.printStackTrace();
 		}
 

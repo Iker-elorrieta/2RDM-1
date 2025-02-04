@@ -73,42 +73,8 @@ public class HiloServidor extends Thread {
 
 	}
 
-
-	private void guardarImagen() {
-	    // Recibimos la cadena Base64 de la imagen
-	    String imagenBase64 = datosRecibidos[2]; // Aquí recibimos la cadena Base64
-
-	 // Decodificar la cadena Base64 a un arreglo de bytes
-	    byte[] imagenBytes = Base64.getDecoder().decode(imagenBase64); // Usamos getDecoder() y decode() de java.util.Base64
-
-
-	    Users usuarioImagen = new Users();
-	    usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
-	    usuarioImagen.setArgazkia(imagenBytes); // Asignamos los bytes a la propiedad de imagen
-
-	    // Guardar la imagen en la base de datos
-	    usuarioImagen.guardarImagen(session);
-	    System.out.println("Imagen guardada correctamente.");
-	}
-
-
-
-	
-	
-
-	private void obtenerMatricula(ObjectOutputStream salida) {
-		Matriculaciones matriculas = new Matriculaciones();
-		String matriculaAlumno[] = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]), session);
-		try {
-			salida.writeObject(matriculaAlumno);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	private void login(ObjectOutputStream salida) throws IOException {
-		
+
 		Users usuario = new Users();
 		usuario.setUsername(datosRecibidos[1]);
 		usuario.setPassword(datosRecibidos[2]);
@@ -116,6 +82,7 @@ public class HiloServidor extends Thread {
 		usuario = usuario.login(session);
 
 		if (usuario != null && usuario.getTipos().getId() != 4) {
+			// Solo pueden logearse profesores
 			String resultadoGuardado = Ciclos.guardarCiclo(8, "ELECRONICA", session);
 			if (!resultadoGuardado.equals(""))
 				System.out.println(resultadoGuardado);
@@ -189,7 +156,7 @@ public class HiloServidor extends Thread {
 		List<Object[]> listaReuniones = new ArrayList<>();
 		for (Reuniones reunion : reuniones) {
 			listaReuniones.add(new Object[] { reunion.getAsunto(), reunion.getAula(), reunion.getEstado(),
-					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion()});
+					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion() });
 		}
 
 		salida.writeObject(listaReuniones);
@@ -213,6 +180,34 @@ public class HiloServidor extends Thread {
 
 		salida.writeObject(resultado);
 
+	}
+
+	private void obtenerMatricula(ObjectOutputStream salida) {
+		Matriculaciones matriculas = new Matriculaciones();
+		String matriculaAlumno[] = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]), session);
+		try {
+			salida.writeObject(matriculaAlumno);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void guardarImagen() {
+		// Recibimos la cadena Base64 de la imagen
+		String imagenBase64 = datosRecibidos[2]; // Aquí recibimos la cadena Base64
+
+		// Decodificar la cadena Base64 a un arreglo de bytes
+		byte[] imagenBytes = Base64.getDecoder().decode(imagenBase64); // Usamos getDecoder() y decode() de
+																		// java.util.Base64
+
+		Users usuarioImagen = new Users();
+		usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
+		usuarioImagen.setArgazkia(imagenBytes); // Asignamos los bytes a la propiedad de imagen
+
+		// Guardar la imagen en la base de datos
+		usuarioImagen.guardarImagen(session);
+		System.out.println("Imagen guardada correctamente.");
 	}
 
 }
