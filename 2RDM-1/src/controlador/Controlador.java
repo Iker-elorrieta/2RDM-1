@@ -88,7 +88,7 @@ public class Controlador implements ActionListener {
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
 		// String ip = "10.5.13.47";
-		String ip = "192.168.1.152";
+		String ip = "localhost";
 
 		try {
 			socket = new Socket(ip, puerto);
@@ -723,7 +723,7 @@ public class Controlador implements ActionListener {
 			return;
 		}
 
-		try { 
+		try {
 			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
 
