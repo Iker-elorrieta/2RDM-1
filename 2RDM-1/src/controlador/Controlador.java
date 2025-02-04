@@ -49,10 +49,12 @@ public class Controlador implements ActionListener {
 	private vista.PanelReunionesPendientes vistaReunionesPendientes;
 
 	private Socket socket = null;
+
 	private int idUsuarioLogeado = 0;
+	private int usuarioNoAdmitidoId = 4;
+
 	private LocalDate fechaSemanaActual = LocalDate.now()
 			.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
-	private int usuarioNoAdmitidoId = 4;
 
 	private String ipCliente = "localhost";
 	private final static String error = "Error", aviso = "Aviso", info = "Información";
