@@ -5,29 +5,36 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import java.net.Socket;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import vista.PanelHorario;
 import vista.Principal;
+
 import modelo.Tipos;
 import modelo.Users;
 
@@ -39,16 +46,17 @@ public class Controlador implements ActionListener {
 	private vista.PanelHorario vistaHorario;
 	private vista.PanelOtrosHorarios vistaOtrosHorarios;
 	private vista.PanelReuniones vistaReuniones;
+	private vista.PanelReunionesPendientes vistaReunionesPendientes;
 
 	private Socket socket = null;
 	private int idUsuarioLogeado = 0;
-	private PanelHorario panelHorario;
 	private LocalDate fechaSemanaActual = LocalDate.now()
 			.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
 	private int usuarioNoAdmitidoId = 4;
 
 	private final static String error = "Error", aviso = "Aviso", info = "Información";
 	private final static String lunes = "L/A", martes = "M/A", miercoles = "X", jueves = "J/O", viernes = "V/O";
+	private final static String a = "aceptada", d = "denegada", p = "pendiente", c = "conflicto";
 	private final static String loginRelleneCampos = "Por favor, rellene todos los campos.",
 			loginIncorrecto = "Usuario o contraseña incorrectos",
 			loginExclusivoProfes = "El uso de la aplicación es exclusivo de profesores",
@@ -56,17 +64,18 @@ public class Controlador implements ActionListener {
 			loginError = "Error al iniciar sesión", horarioNoEncontrado = "No se han encontrado horarios para mostrar",
 			horarioError = "Error al cargar el horario",
 			reunionesNoEncontradas = "No se encontraron reuniones para mostrar.";
-	private final boolean next = true, aceptar = true;
+	private final boolean next = true;
 
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelMenu vistaMenu,
 			vista.PanelHorario vistaHorario, vista.PanelOtrosHorarios vistaOtrosHorarios,
-			vista.PanelReuniones vistaReuniones) {
+			vista.PanelReuniones vistaReuniones, vista.PanelReunionesPendientes vistaReunionesPendientes) {
 		this.vistaPrincipal = vistaPrincipal;
 		this.vistaLogin = vistaLogin;
 		this.vistaMenu = vistaMenu;
 		this.vistaHorario = vistaHorario;
 		this.vistaOtrosHorarios = vistaOtrosHorarios;
 		this.vistaReuniones = vistaReuniones;
+		this.vistaReunionesPendientes = vistaReunionesPendientes;
 
 		this.iniciarConexionConServidor();
 		this.inicializarControlador();
@@ -100,6 +109,7 @@ public class Controlador implements ActionListener {
 		accionesVistaHorario();
 		accionesVistaOtrosHorarios();
 		accionesVistaReuniones();
+		accionesVistaReunionesPendientes();
 	}
 
 	private void accionesVistaLogin() {
@@ -149,11 +159,23 @@ public class Controlador implements ActionListener {
 		this.vistaReuniones.getBtnPreviousWeek()
 				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_PREVIOUS_WEEK.toString());
 
-		this.vistaReuniones.getBtnAceptar().addActionListener(this);
-		this.vistaReuniones.getBtnAceptar().setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_ACEPTAR.toString());
+		this.vistaReuniones.getBtnPendientes().addActionListener(this);
+		this.vistaReuniones.getBtnPendientes()
+				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_PENDIENTES.toString());
 
-		this.vistaReuniones.getBtnRechazar().addActionListener(this);
-		this.vistaReuniones.getBtnRechazar()
+	}
+
+	private void accionesVistaReunionesPendientes() {
+		this.vistaReunionesPendientes.getBtnVolver().addActionListener(this);
+		this.vistaReunionesPendientes.getBtnVolver()
+				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES.toString());
+
+		this.vistaReunionesPendientes.getBtnAceptar().addActionListener(this);
+		this.vistaReunionesPendientes.getBtnAceptar()
+				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_ACEPTAR.toString());
+
+		this.vistaReunionesPendientes.getBtnRechazar().addActionListener(this);
+		this.vistaReunionesPendientes.getBtnRechazar()
 				.setActionCommand(Principal.enumAcciones.PANEL_REUNIONES_RECHAZAR.toString());
 	}
 
@@ -196,10 +218,14 @@ public class Controlador implements ActionListener {
 			cambiarSemana(!next);
 			break;
 		case PANEL_REUNIONES_ACEPTAR:
-			modificarReunion(aceptar);
+			modificarReunion(a, "btn");
 			break;
 		case PANEL_REUNIONES_RECHAZAR:
-			modificarReunion(!aceptar);
+			modificarReunion(d, "btn");
+			break;
+		case PANEL_REUNIONES_PENDIENTES:
+			visualizarPanel(Principal.enumAcciones.PANEL_REUNIONES_PENDIENTES);
+			mCargarReuniones();
 			break;
 		default:
 			break;
@@ -293,22 +319,19 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Método que carga los horarios del usuario logeado enviandole el id al
-	 * servidor y le devuelve una Lista de los Horarios del Usuario
+	 * Carga los horarios del usuario logeado enviandole el id al servidor y le
+	 * devuelve una Lista de los Horarios del Usuario
 	 */
 	public void cargarHorarioProfe() {
-		if (panelHorario == null)
-			panelHorario = new PanelHorario();
-
 		cargarTablaHorario(idUsuarioLogeado, this.vistaPrincipal.getPanelHorario().getModeloHorario());
-
 	}
 
 	/**
-	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista
-	 * de los Otros Horarios y mostrarlos en una tabla.
+	 * Envia el id del usuario para luego recibir del servidor una Lista de los
+	 * Otros Horarios y mostrarlos en una tabla.
 	 */
 	private void mCargarDatosOtrosHorarios() {
+		// Se obtiene el usuario seleccionado del combo box
 		Users usuarioElegido = (Users) this.vistaPrincipal.getPanelOtrosHorarios().getProfesComboBox()
 				.getSelectedItem();
 
@@ -342,10 +365,11 @@ public class Controlador implements ActionListener {
 				return;
 			}
 
-			Object[][] data = new Object[6][6];
+			modelo.setRowCount(6);
+			modelo.setColumnCount(6);
 
 			for (int h = 0; h < 6; h++)
-				data[h][0] = "Hora " + (h + 1);
+				modelo.setValueAt("Hora " + (h + 1), h, 0);
 
 			for (Object[] horarioData : horarios) {
 				String dia = (String) horarioData[0];
@@ -354,29 +378,25 @@ public class Controlador implements ActionListener {
 
 				switch (dia) {
 				case lunes:
-					data[hora][1] = modulo;
+					modelo.setValueAt(modulo, hora, 1);
 					break;
 				case martes:
-					data[hora][2] = modulo;
+					modelo.setValueAt(modulo, hora, 2);
 					break;
 				case miercoles:
-					data[hora][3] = modulo;
+					modelo.setValueAt(modulo, hora, 3);
 					break;
 				case jueves:
-					data[hora][4] = modulo;
+					modelo.setValueAt(modulo, hora, 4);
 					break;
 				case viernes:
-					data[hora][5] = modulo;
+					modelo.setValueAt(modulo, hora, 5);
 					break;
 				default:
 					break;
 				}
+
 			}
-
-			modelo.setRowCount(0);
-
-			for (Object[] row : data)
-				modelo.addRow(row);
 
 		} catch (IOException | ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, horarioError, error, JOptionPane.ERROR_MESSAGE);
@@ -440,80 +460,135 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Metodo que envia el id del usuario para luego recibir del servidor una Lista
-	 * de las Reuniones y mostrarlos en una tabla.
+	 * Carga la tabla de reuniones la cual está formada por el Horario y las
+	 * Reuniones del profesor que esté usando la aplicación.
 	 */
 	private void mCargarReuniones() {
+		// Carga el horario del profesor.
+		cargarTablaHorario(idUsuarioLogeado, this.vistaPrincipal.getPanelReuniones().getModeloReuniones());
+
 		try {
 			ObjectOutputStream sReuniones = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream eReuniones = new ObjectInputStream(socket.getInputStream());
 
 			String[] datosReuniones = { vista.Principal.enumAccionesHiloServidor.REUNIONES.name(),
 					String.valueOf(idUsuarioLogeado) };
+
 			sReuniones.writeObject(datosReuniones);
 
 			@SuppressWarnings("unchecked")
 			List<Object[]> reuniones = (List<Object[]>) eReuniones.readObject();
 
-			if (reuniones == null || reuniones.isEmpty())
+			// Si no se obtiene ninguna reunión muestra un aviso y vuelve al menú.
+			if (reuniones == null || reuniones.isEmpty()) {
 				JOptionPane.showMessageDialog(null, reunionesNoEncontradas, aviso, JOptionPane.WARNING_MESSAGE);
 
-			Map<Integer, String> mapaCentros = cargarCentros();
+				ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
+						Principal.enumAcciones.PANEL_MENU.toString());
 
+				actionPerformed(e);
+			}
+
+			Map<Integer, String> mapaCentros = cargarCentros();
 			LocalDate fechaSemanaActual = LocalDate.parse(this.vistaReuniones.getLblFecha().getText());
 			LocalDate inicioSemana = fechaSemanaActual.with(DayOfWeek.MONDAY);
 			LocalDate finSemana = fechaSemanaActual.with(DayOfWeek.SUNDAY);
 
-			String[][] data = new String[6][6];
-			Map<Point, Color> cellColors = new HashMap<>();
+			String[][] dataAceptadas = new String[6][6];
+			List<String[]> dataPendientes = new ArrayList<>();
+			Map<Point, Color> cellColorsAceptadas = new HashMap<>();
+			Map<Point, Color> cellColorsPendientes = new HashMap<>();
+
+			int rowPendiente = 0;
 
 			for (int h = 0; h < 6; h++)
-				data[h][0] = "Hora " + (h + 1);
+				dataAceptadas[h][0] = "Hora " + (h + 1);
 
 			for (Object[] reunionData : reuniones) {
 				int[] fecha = formatearFecha(reunionData[3].toString());
 				LocalDate localDate = LocalDate.of(fecha[0], fecha[1], fecha[2]);
 
-				// [0] = asunto / [1] = aula / [2] = estado / [3] = fecha / [4] = centro / [5] =
-				// titulo / [6] = ID
-				if (!localDate.isBefore(inicioSemana) && !localDate.isAfter(finSemana)) {
-					String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
-					String nombreCentro = mapaCentros.getOrDefault(Integer.parseInt(reunionData[4].toString()),
-							"Desconocido");
-					String reunionInfo = reunionData[5] + "\n" + nombreCentro + "\n Aula: " + reunionData[1] + "\n ID: "
-							+ reunionData[6];
+				String dia = localDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"));
+				String nombreCentro = mapaCentros.getOrDefault(Integer.parseInt(reunionData[4].toString()),
+						"Desconocido");
+				String reunionInfo = reunionData[5] + "\n" + nombreCentro + "\n Aula: " + reunionData[1];
 
-					int rowIndex = fecha[6] - 1;
-					int columnIndex = switch (dia.toLowerCase()) {
-					case "lunes" -> 1;
-					case "martes" -> 2;
-					case "miércoles" -> 3;
-					case "jueves" -> 4;
-					case "viernes" -> 5;
-					default -> -1;
-					};
+				int rowIndex = fecha[6] - 1;
+				int columnIndex = switch (dia.toLowerCase()) {
+				case "lunes" -> 1;
+				case "martes" -> 2;
+				case "miércoles" -> 3;
+				case "jueves" -> 4;
+				case "viernes" -> 5;
+				default -> -1;
+				};
 
-					if (columnIndex != -1) {
-						data[rowIndex][columnIndex] = reunionInfo;
-						switch (reunionData[2].toString().toLowerCase()) {
-						case "pendiente" -> cellColors.put(new Point(rowIndex, columnIndex), Color.YELLOW);
-						case "aceptada" -> cellColors.put(new Point(rowIndex, columnIndex), Color.GREEN);
-						case "denegada" -> cellColors.put(new Point(rowIndex, columnIndex), Color.RED);
-						case "conflicto" -> cellColors.put(new Point(rowIndex, columnIndex), Color.GRAY);
-						default -> cellColors.put(new Point(rowIndex, columnIndex), Color.WHITE);
+				if (columnIndex != -1) {
+					switch (reunionData[2].toString().toLowerCase()) {
+					case a:
+						if (!localDate.isBefore(inicioSemana) && !localDate.isAfter(finSemana)) {
+							Object a = this.vistaPrincipal.getPanelReuniones().getModeloReuniones().getValueAt(rowIndex,
+									columnIndex);
+
+							if (a != null) {
+								System.out.println("entra");
+								modificarReunion(c, reunionData[6].toString());
+
+								JOptionPane.showMessageDialog(null,
+										"Se le ha establecido el estado de '" + c + "' a la reunión ID: "
+												+ reunionData[6] + " (" + reunionData[5] + ")",
+										aviso, JOptionPane.WARNING_MESSAGE);
+								mCargarReuniones();
+								return;
+							} else {
+								System.out.println("no entra");
+								this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setValueAt(reunionInfo,
+										rowIndex, columnIndex);
+								cellColorsAceptadas.put(new Point(rowIndex, columnIndex), Color.GREEN);
+							}
 						}
+						break;
+					case d:
+						break;
+					case p:
+					case c:
+						String[] reunionPendiente = new String[6];
+						reunionPendiente[0] = reunionData[6].toString();
+						reunionPendiente[1] = reunionData[5].toString();
+						reunionPendiente[2] = reunionData[0].toString();
+						reunionPendiente[3] = nombreCentro;
+						reunionPendiente[4] = localDate.toString();
+						reunionPendiente[5] = reunionData[2].toString();
+
+						dataPendientes.add(reunionPendiente);
+						Color color = Color.WHITE;
+
+						if (reunionData[2].toString().equalsIgnoreCase(p))
+							color = Color.YELLOW;
+						else
+							color = Color.GRAY.brighter();
+
+						for (int col = 0; col <= 5; col++)
+							cellColorsPendientes.put(new Point(rowPendiente, col), color);
+
+						rowPendiente++;
+
+						break;
 					}
 				}
 			}
 
-			this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
+			this.vistaPrincipal.getPanelReunionesPendientes().getModeloReuniones().setRowCount(0);
 
-			for (String[] row : data)
-				this.vistaPrincipal.getPanelReuniones().getModeloReuniones().addRow(row);
+			for (String[] row : dataPendientes)
+				this.vistaPrincipal.getPanelReunionesPendientes().getModeloReuniones().addRow(row);
 
-			this.vistaPrincipal.getPanelReuniones().setCellColors(cellColors);
+			this.vistaPrincipal.getPanelReuniones().setCellColors(cellColorsAceptadas);
+			this.vistaPrincipal.getPanelReunionesPendientes().setCellColors(cellColorsPendientes);
 
-			renderTable(cellColors, true, this.vistaPrincipal.getPanelReuniones().getTablaReuniones());
+			renderTable(cellColorsAceptadas, true, this.vistaPrincipal.getPanelReuniones().getTablaReuniones());
+			renderTable(cellColorsPendientes, true,
+					this.vistaPrincipal.getPanelReunionesPendientes().getTablaReuniones());
 
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -599,6 +674,8 @@ public class Controlador implements ActionListener {
 		else
 			this.vistaReuniones.getLblFecha().setText(fechaActual.minusWeeks(1) + "");
 
+		this.vistaPrincipal.getPanelReuniones().getModeloReuniones().setRowCount(0);
+
 		mCargarReuniones();
 	}
 
@@ -622,59 +699,57 @@ public class Controlador implements ActionListener {
 		});
 	}
 
-	private void modificarReunion(boolean aceptar) {
-		String estado, idReunion = "";
-		JTable tabla = this.vistaPrincipal.getPanelReuniones().getTablaReuniones();
+	private void modificarReunion(String estado, String id) {
+		String idReunion = String.valueOf(id);
 
-		int filaSeleccionada = tabla.getSelectedRow();
-		int columnaSeleccionada = tabla.getSelectedColumn();
+		// se le envia -1 si queremos que haga las acciones de los botones aceptar o
+		// rechazar, sino, obtiene el id que le estamos mandando
+		if (id.equalsIgnoreCase("btn")) {
+			JTable tabla = this.vistaPrincipal.getPanelReunionesPendientes().getTablaReuniones();
 
-		if (filaSeleccionada != -1 && columnaSeleccionada != -1) {
-			Object valorCelda = tabla.getValueAt(filaSeleccionada, columnaSeleccionada);
-
-			if (valorCelda == null)
+			int filaSeleccionada = tabla.getSelectedRow();
+			if (filaSeleccionada != -1) {
+				idReunion = tabla.getValueAt(filaSeleccionada, 0).toString().trim(); // Columna "ID"
+			} else {
+				JOptionPane.showMessageDialog(null, "Por favor, selecciona una reunión.", aviso,
+						JOptionPane.WARNING_MESSAGE);
 				return;
-
-			if (valorCelda instanceof String) {
-				String contenido = (String) valorCelda;
-
-				int indexID = contenido.lastIndexOf("ID:");
-				if (indexID != -1)
-					idReunion = contenido.substring(indexID + 3).trim();
 			}
-
-			if (aceptar)
-				estado = "aceptada";
-			else
-				estado = "denegada";
-
-			try {
-				ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
-				ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
-
-				String[] datosReunion = { vista.Principal.enumAccionesHiloServidor.MODIFICARREUNION.name(), idReunion,
-						estado };
-
-				salida.writeObject(datosReunion);
-
-				boolean resultado = (boolean) entrada.readObject();
-
-				if (resultado)
-					JOptionPane.showMessageDialog(null, "La reunión se modificó correctamente.", info,
-							JOptionPane.INFORMATION_MESSAGE);
-				else
-					JOptionPane.showMessageDialog(null, "Error: No se pudo modificar la reunión.", error,
-							JOptionPane.ERROR_MESSAGE);
-
-				mCargarReuniones();
-
-			} catch (IOException | ClassNotFoundException e) {
-				System.out.println("Error al cargar reuniones: " + e.getMessage());
-				e.printStackTrace();
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Por favor, selecciona una reunión.", aviso,
-					JOptionPane.WARNING_MESSAGE);
 		}
+
+		if (idReunion.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "No se pudo obtener el ID de la reunión.", aviso,
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		try {
+			ObjectOutputStream salida = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream());
+
+			String[] datosReunion = { vista.Principal.enumAccionesHiloServidor.MODIFICARREUNION.name(), idReunion,
+					estado };
+
+			salida.writeObject(datosReunion);
+
+			boolean resultado = (boolean) entrada.readObject();
+
+			if (resultado) {
+				if (id.equalsIgnoreCase("btn")) {
+					JOptionPane.showMessageDialog(null, "La reunión ID: " + idReunion + " se modificó correctamente.",
+							info, JOptionPane.INFORMATION_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "Error: No se pudo modificar la reunión.", error,
+						JOptionPane.ERROR_MESSAGE);
+			}
+			mCargarReuniones();
+
+		} catch (IOException | ClassNotFoundException e) {
+			System.err.println("Error al modificar reunión: " + e.getMessage());
+			e.printStackTrace();
+		}
+
 	}
+
 }

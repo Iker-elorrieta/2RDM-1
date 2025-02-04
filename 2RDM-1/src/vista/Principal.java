@@ -12,11 +12,12 @@ public class Principal extends JFrame {
 	public static enum enumAcciones {
 		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES,
 		CARGAR_TABLA_OTROS_HORARIOS, PANEL_REUNIONES_NEXT_WEEK, PANEL_REUNIONES_PREVIOUS_WEEK, PANEL_REUNIONES_ACEPTAR,
-		PANEL_REUNIONES_RECHAZAR
+		PANEL_REUNIONES_RECHAZAR, PANEL_REUNIONES_PENDIENTES
 	}
 
 	public static enum enumAccionesHiloServidor {
-		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, OBTENERCENTROS, OBTENERMATRICULACIONES, MODIFICARREUNION, GUARDARIMAGEN;
+		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, OBTENERCENTROS, OBTENERMATRICULACIONES, MODIFICARREUNION,
+		GUARDARIMAGEN;
 	}
 
 	private JPanel panelContenedor;
@@ -25,6 +26,7 @@ public class Principal extends JFrame {
 	private PanelHorario panelHorario;
 	private PanelOtrosHorarios panelOtrosHorarios;
 	private PanelReuniones panelReuniones;
+	private PanelReunionesPendientes panelReunionesPendientes;
 
 	public Principal() {
 
@@ -34,6 +36,7 @@ public class Principal extends JFrame {
 		crearPanelHorario();
 		crearPanelOtrosHorarios();
 		crearPanelReuniones();
+		crearPanelReunionesPendientes();
 
 		// Mostrar el panel de login al inicio.
 		visualizarPaneles(enumAcciones.PANEL_LOGIN);
@@ -89,6 +92,14 @@ public class Principal extends JFrame {
 
 	}
 
+	private void crearPanelReunionesPendientes() {
+		panelReunionesPendientes = new PanelReunionesPendientes();
+		panelReunionesPendientes.setBounds(0, 0, 1050, 650);
+		panelContenedor.add(panelReunionesPendientes);
+		panelReunionesPendientes.setVisible(false);
+
+	}
+
 	public void visualizarPaneles(enumAcciones panel) {
 		// Ocultar ambos paneles primero.
 		panelLogin.setVisible(false);
@@ -96,6 +107,7 @@ public class Principal extends JFrame {
 		panelHorario.setVisible(false);
 		panelOtrosHorarios.setVisible(false);
 		panelReuniones.setVisible(false);
+		panelReunionesPendientes.setVisible(false);
 
 		switch (panel) {
 		case PANEL_LOGIN:
@@ -113,6 +125,9 @@ public class Principal extends JFrame {
 		case PANEL_REUNIONES:
 			panelReuniones.setVisible(true);
 			break;
+		case PANEL_REUNIONES_PENDIENTES:
+			panelReunionesPendientes.setVisible(true);
+			break;
 		default:
 			break;
 
@@ -123,39 +138,24 @@ public class Principal extends JFrame {
 		return panelLogin;
 	}
 
-	public void setPanelLogin(PanelLogin panelLogin) {
-		this.panelLogin = panelLogin;
-	}
-
 	public PanelMenu getPanelMenu() {
 		return panelMenu;
-	}
-
-	public void setPanelMenu(PanelMenu panelMenu) {
-		this.panelMenu = panelMenu;
 	}
 
 	public PanelHorario getPanelHorario() {
 		return panelHorario;
 	}
 
-	public void setPanelHorario(PanelHorario panelHorario) {
-		this.panelHorario = panelHorario;
-	}
-
 	public PanelOtrosHorarios getPanelOtrosHorarios() {
 		return panelOtrosHorarios;
-	}
-
-	public void setPanelOtrosHorarios(PanelOtrosHorarios panelOtrosHorarios) {
-		this.panelOtrosHorarios = panelOtrosHorarios;
 	}
 
 	public PanelReuniones getPanelReuniones() {
 		return panelReuniones;
 	}
 
-	public void setPanelReuniones(PanelReuniones panelReuniones) {
-		this.panelReuniones = panelReuniones;
+	public PanelReunionesPendientes getPanelReunionesPendientes() {
+		return panelReunionesPendientes;
 	}
+
 }

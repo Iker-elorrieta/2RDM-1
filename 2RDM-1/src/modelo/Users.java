@@ -238,15 +238,26 @@ public class Users implements java.io.Serializable {
 	}
 
 	public void guardarImagen(Session session) {
-		Transaction tx = null;
-		tx = session.beginTransaction();
-		Users a = new Users();
-		a.setId(id);
-		a.setArgazkia(argazkia);
-		a.setApellidos("Actualizado");
-		session.update(a);
-		tx.commit();
-		System.out.println("Actualizado");
+	    Transaction tx = null;
+	    try {
+	        tx = session.beginTransaction();
+	        
+	        // Obtener el usuario existente desde la base de datos
+	        Users usuarioExistente = session.get(Users.class, id);
+	        
+	        if (usuarioExistente != null) {
+	            // Actualizar los campos del usuario
+	            usuarioExistente.setArgazkia(argazkia);
+	            
+	            // Si el objeto ya está asociado a la sesión, Hibernate manejará la actualización
+	            session.update(usuarioExistente);
+	        }
+	        
+	        tx.commit();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
+
 
 }
