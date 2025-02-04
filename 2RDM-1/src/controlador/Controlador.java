@@ -54,7 +54,7 @@ public class Controlador implements ActionListener {
 			.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
 	private int usuarioNoAdmitidoId = 4;
 
-	private String ip = "localhost";
+	private String ipCliente = "localhost";
 	private final static String error = "Error", aviso = "Aviso", info = "Información";
 	private final static String lunes = "L/A", martes = "M/A", miercoles = "X", jueves = "J/O", viernes = "V/O";
 	private final static String lunesFull = "lunes", martesFull = "martes", miercolesFull = "miércoles",
@@ -97,6 +97,7 @@ public class Controlador implements ActionListener {
 	 */
 	private void iniciarConexionConServidor() {
 		int puerto = 2000;
+		String ip = ipCliente;
 
 		try {
 			socket = new Socket(ip, puerto);
