@@ -11,11 +11,13 @@ public class Principal extends JFrame {
 
 	public static enum enumAcciones {
 		PANEL_LOGIN, LOGIN_INICIAR_SESION, PANEL_MENU, PANEL_HORARIO, PANEL_OTROS_HORARIOS, PANEL_REUNIONES,
-		CARGAR_TABLA_OTROS_HORARIOS
+		CARGAR_TABLA_OTROS_HORARIOS, PANEL_REUNIONES_NEXT_WEEK, PANEL_REUNIONES_PREVIOUS_WEEK, PANEL_REUNIONES_ACEPTAR,
+		PANEL_REUNIONES_RECHAZAR, PANEL_REUNIONES_PENDIENTES
 	}
 
 	public static enum enumAccionesHiloServidor {
-		LOGIN, HORARIO, TODOSUSUARIOS, OTROSHORARIOS, REUNIONES;
+		LOGIN, HORARIO, TODOSUSUARIOS, REUNIONES, OBTENERCENTROS, OBTENERMATRICULACIONES, MODIFICARREUNION,
+		GUARDARIMAGEN;
 	}
 
 	private JPanel panelContenedor;
@@ -24,6 +26,7 @@ public class Principal extends JFrame {
 	private PanelHorario panelHorario;
 	private PanelOtrosHorarios panelOtrosHorarios;
 	private PanelReuniones panelReuniones;
+	private PanelReunionesPendientes panelReunionesPendientes;
 
 	public Principal() {
 
@@ -33,6 +36,7 @@ public class Principal extends JFrame {
 		crearPanelHorario();
 		crearPanelOtrosHorarios();
 		crearPanelReuniones();
+		crearPanelReunionesPendientes();
 
 		// Mostrar el panel de login al inicio.
 		visualizarPaneles(enumAcciones.PANEL_LOGIN);
@@ -40,9 +44,9 @@ public class Principal extends JFrame {
 
 	private void crearPanelContenedor() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(0, 0, 900, 600);
+		setBounds(0, 0, 1068, 691);
 		panelContenedor = new JPanel();
-		panelContenedor.setBackground(new Color(141, 204, 235));
+		panelContenedor.setBackground(new Color(220, 220, 220));
 		panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(panelContenedor);
 		panelContenedor.setLayout(null);
@@ -50,41 +54,49 @@ public class Principal extends JFrame {
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
-		panelLogin.setBounds(0, 0, 884, 561);
+		panelLogin.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelLogin);
-		panelLogin.setVisible(false); // Ocultar inicialmente
+		panelLogin.setVisible(false);
 
 	}
 
 	private void crearPanelMenu() {
 		panelMenu = new PanelMenu();
-		panelMenu.setBounds(0, 0, 884, 561);
+		panelMenu.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelMenu);
-		panelMenu.setVisible(false); // Ocultar inicialmente
+		panelMenu.setVisible(false);
 
 	}
 
 	private void crearPanelHorario() {
 		panelHorario = new PanelHorario();
-		panelHorario.setBounds(0, 0, 884, 561);
+		panelHorario.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelHorario);
-		panelHorario.setVisible(false); // Ocultar inicialmente
+		panelHorario.setVisible(false);
 
 	}
 
 	private void crearPanelOtrosHorarios() {
 		panelOtrosHorarios = new PanelOtrosHorarios();
-		panelOtrosHorarios.setBounds(0, 0, 884, 561);
+		panelOtrosHorarios.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelOtrosHorarios);
-		panelOtrosHorarios.setVisible(false); // Ocultar inicialmente
+		panelOtrosHorarios.setVisible(false);
 
 	}
 
 	private void crearPanelReuniones() {
 		panelReuniones = new PanelReuniones();
-		panelReuniones.setBounds(0, 0, 884, 561);
+		panelReuniones.setBounds(0, 0, 1050, 650);
 		panelContenedor.add(panelReuniones);
-		panelReuniones.setVisible(false); // Ocultar inicialmente
+		panelReuniones.setVisible(false);
+
+	}
+
+	private void crearPanelReunionesPendientes() {
+		panelReunionesPendientes = new PanelReunionesPendientes();
+		panelReunionesPendientes.setBounds(0, 0, 1050, 650);
+		panelContenedor.add(panelReunionesPendientes);
+		panelReunionesPendientes.setVisible(false);
 
 	}
 
@@ -95,6 +107,7 @@ public class Principal extends JFrame {
 		panelHorario.setVisible(false);
 		panelOtrosHorarios.setVisible(false);
 		panelReuniones.setVisible(false);
+		panelReunionesPendientes.setVisible(false);
 
 		switch (panel) {
 		case PANEL_LOGIN:
@@ -112,6 +125,9 @@ public class Principal extends JFrame {
 		case PANEL_REUNIONES:
 			panelReuniones.setVisible(true);
 			break;
+		case PANEL_REUNIONES_PENDIENTES:
+			panelReunionesPendientes.setVisible(true);
+			break;
 		default:
 			break;
 
@@ -122,39 +138,24 @@ public class Principal extends JFrame {
 		return panelLogin;
 	}
 
-	public void setPanelLogin(PanelLogin panelLogin) {
-		this.panelLogin = panelLogin;
-	}
-
 	public PanelMenu getPanelMenu() {
 		return panelMenu;
-	}
-
-	public void setPanelMenu(PanelMenu panelMenu) {
-		this.panelMenu = panelMenu;
 	}
 
 	public PanelHorario getPanelHorario() {
 		return panelHorario;
 	}
 
-	public void setPanelHorario(PanelHorario panelHorario) {
-		this.panelHorario = panelHorario;
-	}
-
 	public PanelOtrosHorarios getPanelOtrosHorarios() {
 		return panelOtrosHorarios;
-	}
-
-	public void setPanelOtrosHorarios(PanelOtrosHorarios panelOtrosHorarios) {
-		this.panelOtrosHorarios = panelOtrosHorarios;
 	}
 
 	public PanelReuniones getPanelReuniones() {
 		return panelReuniones;
 	}
 
-	public void setPanelReuniones(PanelReuniones panelReuniones) {
-		this.panelReuniones = panelReuniones;
+	public PanelReunionesPendientes getPanelReunionesPendientes() {
+		return panelReunionesPendientes;
 	}
+
 }

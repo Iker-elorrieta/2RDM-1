@@ -28,12 +28,12 @@ public class PanelOtrosHorarios extends JPanel {
 
 	public PanelOtrosHorarios() {
 		setBackground(new Color(220, 220, 220));
-		setBounds(0, 0, 884, 561);
+		setBounds(0, 0, 1050, 650);
 		setLayout(null);
 
 		String columnas[] = { "", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes" };
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(20, 70, 842, 425);
+		scrollPane.setBounds(31, 72, 990, 503);
 		add(scrollPane);
 
 		modeloOtrosHorarios = new DefaultTableModel(columnas, 0);
@@ -43,7 +43,7 @@ public class PanelOtrosHorarios extends JPanel {
 		tablaOtrosHorarios.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tablaOtrosHorarios.setRowSelectionAllowed(false);
 		tablaOtrosHorarios.setCellSelectionEnabled(false);
-		tablaOtrosHorarios.setRowHeight(67);
+		tablaOtrosHorarios.setRowHeight(80);
 		tablaOtrosHorarios.getColumnModel().getColumn(0).setMaxWidth(70);
 
 		tablaOtrosHorarios.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -70,7 +70,7 @@ public class PanelOtrosHorarios extends JPanel {
 		scrollPane.setViewportView(tablaOtrosHorarios);
 
 		btnVolver = new JButton("Volver");
-		btnVolver.setBounds(20, 505, 150, 35);
+		btnVolver.setBounds(20, 593, 211, 37);
 		btnVolver.setForeground(Color.WHITE);
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnVolver.setBorder(new LineBorder(new Color(255, 255, 255), 2));
@@ -80,7 +80,7 @@ public class PanelOtrosHorarios extends JPanel {
 		profesComboBox = new JComboBox<Users>();
 		profesComboBox.setMaximumRowCount(10);
 		profesComboBox.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		profesComboBox.setBounds(697, 25, 165, 28);
+		profesComboBox.setBounds(856, 31, 165, 28);
 		add(profesComboBox);
 	}
 

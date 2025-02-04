@@ -14,7 +14,7 @@ public class PanelMenu extends JPanel {
 
 	public PanelMenu() {
 		setBackground(new Color(220, 220, 220));
-		setBounds(0, 0, 884, 561);
+		setBounds(0, 0, 1050, 650);
 		setLayout(null);
 
 		btnHorario = new JButton("Consultar horario");
@@ -22,7 +22,7 @@ public class PanelMenu extends JPanel {
 		btnHorario.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnHorario.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnHorario.setBackground(new Color(100, 100, 100));
-		btnHorario.setBounds(341, 183, 218, 35);
+		btnHorario.setBounds(416, 202, 218, 45);
 		add(btnHorario);
 
 		btnOtrosHorarios = new JButton("Consultar otros horarios");
@@ -30,7 +30,7 @@ public class PanelMenu extends JPanel {
 		btnOtrosHorarios.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnOtrosHorarios.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnOtrosHorarios.setBackground(new Color(100, 100, 100));
-		btnOtrosHorarios.setBounds(341, 263, 218, 35);
+		btnOtrosHorarios.setBounds(416, 302, 218, 45);
 		add(btnOtrosHorarios);
 
 		btnReuniones = new JButton("Ver reuniones");
@@ -38,7 +38,7 @@ public class PanelMenu extends JPanel {
 		btnReuniones.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnReuniones.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnReuniones.setBackground(new Color(100, 100, 100));
-		btnReuniones.setBounds(341, 343, 218, 35);
+		btnReuniones.setBounds(416, 402, 218, 45);
 		add(btnReuniones);
 
 		btnDesconectarse = new JButton("Desconectarse");
@@ -46,7 +46,7 @@ public class PanelMenu extends JPanel {
 		btnDesconectarse.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnDesconectarse.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnDesconectarse.setBackground(new Color(100, 100, 100));
-		btnDesconectarse.setBounds(20, 505, 150, 35);
+		btnDesconectarse.setBounds(20, 593, 211, 37);
 		add(btnDesconectarse);
 
 	}

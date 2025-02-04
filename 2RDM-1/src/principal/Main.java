@@ -11,7 +11,7 @@ public class Main {
 
 			new Controlador(ventanaPrincipal, ventanaPrincipal.getPanelLogin(), ventanaPrincipal.getPanelMenu(),
 					ventanaPrincipal.getPanelHorario(), ventanaPrincipal.getPanelOtrosHorarios(),
-					ventanaPrincipal.getPanelReuniones());
+					ventanaPrincipal.getPanelReuniones(), ventanaPrincipal.getPanelReunionesPendientes());
 
 		} catch (Exception e) {
 			e.printStackTrace();
