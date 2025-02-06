@@ -669,6 +669,7 @@ public class Controlador implements ActionListener {
 	 */
 	private Map<Integer, String> cargarCentros() throws IOException, ClassNotFoundException {
 
+		
 		ObjectOutputStream sCentros = new ObjectOutputStream(socket.getOutputStream());
 		ObjectInputStream eCentros = new ObjectInputStream(socket.getInputStream());
 
