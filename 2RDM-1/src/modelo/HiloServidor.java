@@ -62,6 +62,9 @@ public class HiloServidor extends Thread {
 				case GUARDARIMAGEN:
 					guardarImagen();
 					break;
+				case HORARIOALUMNO:
+					obtenerHorarioAlumno(salida);
+					break;
 				}
 
 				salida.flush();
@@ -69,6 +72,51 @@ public class HiloServidor extends Thread {
 
 		} catch (IOException | ClassNotFoundException e) {
 			System.out.println("Cliente " + cliente.getInetAddress() + " desconectado (" + e.getMessage() + ")");
+		}
+
+	}
+
+
+	private void obtenerHorarioAlumno(ObjectOutputStream salida) {
+		Horarios h = new Horarios();
+		List<Object[]> horariosAlumno = new ArrayList<>();
+		horariosAlumno = h.cargarHorariosAlumno(session);
+
+		
+		try {
+			salida.writeObject(horariosAlumno);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	private void guardarImagen() {
+	    // Recibimos la cadena Base64 de la imagen
+	    String imagenBase64 = datosRecibidos[2]; // Aquí recibimos la cadena Base64
+
+	 // Decodificar la cadena Base64 a un arreglo de bytes
+	    byte[] imagenBytes = Base64.getDecoder().decode(imagenBase64); // Usamos getDecoder() y decode() de java.util.Base64
+
+
+	    Users usuarioImagen = new Users();
+	    usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
+	    usuarioImagen.setArgazkia(imagenBytes); // Asignamos los bytes a la propiedad de imagen
+
+	    // Guardar la imagen en la base de datos
+	    usuarioImagen.guardarImagen(session);
+	    System.out.println("Imagen guardada correctamente.");
+	}
+
+
+	private void obtenerMatricula(ObjectOutputStream salida) {
+		Matriculaciones matriculas = new Matriculaciones();
+		String matriculaAlumno[] = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]), session);
+		try {
+			salida.writeObject(matriculaAlumno);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -183,32 +231,5 @@ public class HiloServidor extends Thread {
 
 	}
 
-	private void obtenerMatricula(ObjectOutputStream salida) {
-		Matriculaciones matriculas = new Matriculaciones();
-		String matriculaAlumno[] = matriculas.recogerMatriculaPorId(Integer.parseInt(datosRecibidos[1]), session);
-		try {
-			salida.writeObject(matriculaAlumno);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	private void guardarImagen() {
-		// Recibimos la cadena Base64 de la imagen
-		String imagenBase64 = datosRecibidos[2]; // Aquí recibimos la cadena Base64
-
-		// Decodificar la cadena Base64 a un arreglo de bytes
-		byte[] imagenBytes = Base64.getDecoder().decode(imagenBase64); // Usamos getDecoder() y decode() de
-																		// java.util.Base64
-
-		Users usuarioImagen = new Users();
-		usuarioImagen.setId(Integer.parseInt(datosRecibidos[1]));
-		usuarioImagen.setArgazkia(imagenBytes); // Asignamos los bytes a la propiedad de imagen
-
-		// Guardar la imagen en la base de datos
-		usuarioImagen.guardarImagen(session);
-		System.out.println("Imagen guardada correctamente.");
-	}
 
 }

@@ -1,7 +1,9 @@
 package modelo;// Generated 14 ene 2025, 11:50:45 by Hibernate Tools 6.5.1.Final
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -69,8 +71,8 @@ public class Horarios implements java.io.Serializable {
 
 	public List<Horarios> cargarHorariosPorUsuario(int userId, Session session) {
 		String hql = "FROM Horarios h " + "LEFT JOIN FETCH h.users " + "LEFT JOIN FETCH h.modulos "
-				+ "WHERE h.id.profeId ='" + userId + "'";
-
+				+ "WHERE h.id.profeId ='" + userId + "'";		
+		
 		Query query = session.createQuery(hql);
 
 		@SuppressWarnings("unchecked")
@@ -78,5 +80,37 @@ public class Horarios implements java.io.Serializable {
 
 		return horarios;
 	}
+
+
+
+	public List<Object[]> cargarHorariosAlumno(Session session) {
+	    String hql = "SELECT h.id.dia, h.id.hora, h.modulos.nombre "
+	               + "FROM Horarios h "
+	               + "WHERE h.modulos.ciclos.id = (SELECT m.ciclos.id FROM Matriculaciones m WHERE m.users.id = 3) "
+	               + "AND h.modulos.curso = (SELECT mat.id.curso FROM Matriculaciones mat WHERE mat.users.id = 3) "
+	               + "ORDER BY h.id.dia, h.id.hora";
+
+	    Query q = session.createQuery(hql);
+	    List<Object[]> horarios = q.list();
+
+	    // Para eliminar duplicados manteniendo el orden
+	    
+	    Set<String> uniqueSet = new LinkedHashSet<>();
+	    
+	    List<Object[]> horariosUnicos = new ArrayList<>();
+
+	    for (Object[] fila : horarios) {
+	        String comparar = fila[0] + "" + fila[1] + "" + fila[2];
+	        if (!uniqueSet.contains(comparar)) {
+	            uniqueSet.add(comparar);
+	            
+	            horariosUnicos.add(new Object[]{fila[0], fila[1], fila[2]}); // Guardar en la lista sin duplicados
+	        }
+	    }
+
+	    return horariosUnicos;
+	}
+
+
 
 }
