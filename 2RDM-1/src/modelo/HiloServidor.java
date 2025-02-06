@@ -62,6 +62,9 @@ public class HiloServidor extends Thread {
 				case GUARDARIMAGEN:
 					guardarImagen();
 					break;
+				case HORARIOALUMNO:
+					obtenerHorarioAlumno(salida);
+					break;
 				}
 
 				salida.flush();
@@ -73,6 +76,21 @@ public class HiloServidor extends Thread {
 
 	}
 
+
+	private void obtenerHorarioAlumno(ObjectOutputStream salida) {
+		Horarios h = new Horarios();
+		List<Object[]> horariosAlumno = new ArrayList<>();
+		horariosAlumno = h.cargarHorariosAlumno(session);
+
+		
+		try {
+			salida.writeObject(horariosAlumno);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 	private void guardarImagen() {
 	    // Recibimos la cadena Base64 de la imagen
@@ -91,10 +109,6 @@ public class HiloServidor extends Thread {
 	    System.out.println("Imagen guardada correctamente.");
 	}
 
-
-
-	
-	
 
 	private void obtenerMatricula(ObjectOutputStream salida) {
 		Matriculaciones matriculas = new Matriculaciones();
