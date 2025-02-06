@@ -156,7 +156,7 @@ public class HiloServidor extends Thread {
 		List<Object[]> listaReuniones = new ArrayList<>();
 		for (Reuniones reunion : reuniones) {
 			listaReuniones.add(new Object[] { reunion.getAsunto(), reunion.getAula(), reunion.getEstado(),
-					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion() });
+					reunion.getFecha(), reunion.getIdCentro(), reunion.getTitulo(), reunion.getIdReunion(), reunion.getUsersByProfesorId().getNombre(), reunion.getUsersByAlumnoId().getNombre()});
 		}
 
 		salida.writeObject(listaReuniones);
@@ -165,6 +165,7 @@ public class HiloServidor extends Thread {
 	private void obtenerCentros(ObjectOutputStream salida) throws IOException {
 		Centros c = new Centros();
 		List<Centros> centros = c.leerJson();
+		
 
 		List<Object[]> listaCentros = new ArrayList<>();
 		for (Centros centro : centros) {

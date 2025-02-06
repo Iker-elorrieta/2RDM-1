@@ -130,14 +130,16 @@ public class Reuniones implements java.io.Serializable {
 	@SuppressWarnings("unchecked")
 	public List<Reuniones> getReunionesById(int i) {
 		SessionFactory sesion = HibernateUtil.getSessionFactory();
-		Session session = sesion.openSession();
-		String hql = "FROM Reuniones WHERE usersByProfesorId.id=" + i;
-		Query query = session.createQuery(hql);
-
-		List<Reuniones> reuniones = query.list();
-
-		session.close();
-		return reuniones;
+	    Session session = sesion.openSession();
+	    
+	    String hql = "FROM Reuniones r JOIN FETCH r.usersByProfesorId WHERE r.usersByProfesorId.id = :id";
+	    Query query = session.createQuery(hql);
+	    query.setParameter("id", i);
+	    
+	    List<Reuniones> reuniones = query.list();
+	    
+	    
+	    return reuniones;
 
 	}
 
