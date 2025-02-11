@@ -810,7 +810,7 @@ public class Controlador implements ActionListener {
 
 			salida.writeObject(datosReunion);
 
-			boolean resultado = (boolean) entrada.readObject();
+				boolean resultado = (boolean) entrada.readObject();
 
 			if (resultado) {
 				if (id.equalsIgnoreCase(btn)) {

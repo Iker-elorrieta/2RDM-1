@@ -170,6 +170,8 @@ public class Reuniones implements java.io.Serializable {
 			if (tx != null)
 				tx.rollback();
 
+		} finally {
+			session.close();
 		}
 
 		return exito;
