@@ -65,6 +65,7 @@ public class HiloServidor extends Thread {
 				case HORARIOALUMNO:
 					obtenerHorarioAlumno(salida);
 					break;
+					
 				}
 
 				salida.flush();
@@ -211,23 +212,30 @@ public class HiloServidor extends Thread {
 	}
 
 	private void obtenerCentros(ObjectOutputStream salida) throws IOException {
+
 		Centros c = new Centros();
+
 		List<Centros> centros = c.leerJson();
-		
+
 
 		List<Object[]> listaCentros = new ArrayList<>();
+
 		for (Centros centro : centros) {
-			listaCentros.add(new Object[] { centro.getId(), centro.getCentro() });
+
+			listaCentros.add(new Object[] { centro.getId(), centro.getCentro(), centro.getLatitud() ,centro.getLongitud() });
+
 		}
 
-		salida.writeObject(listaCentros);
-	}
 
+		salida.writeObject(listaCentros);
+
+	}
 	private void aceptarReunion(ObjectOutputStream salida) throws IOException {
 		Reuniones r = new Reuniones();
 		boolean resultado = r.modificarReunion(Integer.parseInt(datosRecibidos[1]), datosRecibidos[2].toString());
-
+		
 		salida.writeObject(resultado);
+		salida.flush();
 
 	}
 
